@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>この人を知っていますか？</title>
+  <link rel="stylesheet" href="desktop.css">
+</head>
+<body>
+  <main id="desktop" aria-label="仮想デスクトップ">
+    <section class="desktop-icons" id="desktop-icons" aria-label="アプリ"></section>
+    <section class="window-layer" id="window-layer" aria-live="polite"></section>
+    <aside class="start-menu" id="start-menu" hidden>
+      <header><span class="account-dot"></span><div><strong id="start-title">Virtual Desktop</strong><small>ローカル調査環境</small></div></header>
+      <label class="start-search">⌕<input id="start-filter" type="search" placeholder="アプリを検索" aria-label="アプリを検索"></label>
+      <nav id="start-apps" class="start-apps" aria-label="アプリ一覧"></nav>
+      <footer><button id="fiction-button" type="button">この作品について</button><button id="reset-button" class="danger" type="button">保存データを初期化</button></footer>
+    </aside>
+    <dialog id="fiction-dialog">
+      <form method="dialog" class="dialog-card">
+        <button class="dialog-close" aria-label="閉じる">×</button><span class="dialog-icon">i</span>
+        <h2>このデスクトップについて</h2>
+        <p>『この人を知っていますか？』はフィクションです。失踪、ストーカー被害、社会的孤立、記憶への不安を扱います。外部通信、実通話、端末情報の取得は行いません。</p>
+        <dl><div><dt>作品</dt><dd id="info-project">-</dd></div><div><dt>版</dt><dd id="info-version">-</dd></div><div><dt>保存</dt><dd id="info-save-state">-</dd></div></dl>
+        <p id="save-status" role="status" aria-live="polite"></p>
+        <div class="dialog-actions"><button id="export-save-button" type="button">保存を書き出す</button><button id="import-save-button" type="button">保存を読み込む</button><button id="dialog-reset-button" class="danger" type="button">初期化</button></div>
+        <input id="import-save-file" type="file" accept="application/json,.json" hidden><div id="customer-information" data-customer-docs-slot hidden></div>
+      </form>
+    </dialog>
+    <section class="top-route-host" data-vdm-top-route-host hidden><header><strong data-vdm-top-route-title>Document</strong><span data-vdm-top-route-address></span><button type="button" data-vdm-top-route-close>×</button></header><iframe data-primary-route title="Primary document"></iframe></section>
+  </main>
+  <footer class="taskbar">
+    <button id="start-button" class="start-button" type="button" aria-expanded="false" aria-controls="start-menu" aria-label="スタート"><span class="win-mark"><i></i><i></i><i></i><i></i></span></button>
+    <nav id="task-list" aria-label="開いているアプリ"></nav>
+    <button id="case-console-button" class="case-console-task" type="button">復旧管理</button>
+    <div class="system-tray"><span aria-label="オフライン">⌁</span><time id="clock"></time></div>
+  </footer>
+  <script src="case-manifest.js"></script><script src="crypto-runtime.js"></script><script src="save-adapter.js"></script><script src="core/event-bus.js"></script><script src="core/router.js"></script><script src="case-state.js"></script><script src="desktop.js"></script><script src="case-ui.js"></script>
+</body>
+</html>

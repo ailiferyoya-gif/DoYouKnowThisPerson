@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.browser=window.VDM_CONTENT_DATA.browser||{home:"search://home"};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.browser,window.VDM_APP_DATA);})();

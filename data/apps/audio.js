@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.audio=window.VDM_CONTENT_DATA.audio||{items:[],voicemails:[],calls:[]};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.audio,window.VDM_APP_DATA);})();

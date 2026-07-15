@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.mail=window.VDM_CONTENT_DATA.mail||{messages:[],folders:["inbox","sent","drafts","starred","archive","trash"]};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.mail,window.VDM_APP_DATA);})();

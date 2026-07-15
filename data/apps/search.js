@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.search=window.VDM_CONTENT_DATA.search||{records:[],vocabulary:[],discoveredTerms:[]};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.search,window.VDM_APP_DATA);})();

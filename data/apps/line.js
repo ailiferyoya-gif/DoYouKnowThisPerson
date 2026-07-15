@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.messages=window.VDM_CONTENT_DATA.messages||{conversations:[],intents:[],calls:[],contacts:[]};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.messages,window.VDM_APP_DATA);})();

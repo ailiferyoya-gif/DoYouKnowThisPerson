@@ -1,0 +1,32 @@
+{
+    "schemaVersion":  1,
+    "projectName":  "この人を知っていますか？",
+    "caseSlug":  "doyouknowthisperson",
+    "selectedApps":  [
+                         "search",
+                         "browser",
+                         "social",
+                         "line",
+                         "mail",
+                         "photos",
+                         "audio",
+                         "files",
+                         "notes",
+                         "settings"
+                     ],
+    "features":  {
+                     "generatedImages":  true,
+                     "audioMode":  "On",
+                     "audio":  true,
+                     "video":  false,
+                     "fictionalSites":  true,
+                     "richSites":  true,
+                     "interactiveMessaging":  true,
+                     "localCalls":  true,
+                     "searchSessions":  true,
+                     "pageVersioning":  true,
+                     "templateV2Smoke":  false
+                 },
+    "publicVersion":  "1.0.0",
+    "buildTimestamp":  "2026-07-15T00:00:00Z"
+}

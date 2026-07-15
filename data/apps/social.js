@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.social=window.VDM_CONTENT_DATA.social||{viewer:{id:"local-viewer",name:"You",handle:"local"},accounts:[],posts:[],trends:[],notifications:[]};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.social,window.VDM_APP_DATA);})();

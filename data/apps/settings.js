@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.settings=window.VDM_CONTENT_DATA.settings||{sound:true,volume:.8,reducedMotion:false,textScale:1,contrast:"normal",hints:true};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.settings,window.VDM_APP_DATA);})();

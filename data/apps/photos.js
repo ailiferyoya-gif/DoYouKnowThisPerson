@@ -1,0 +1,1 @@
+(function(){"use strict";window.VDM_CONTENT_DATA.photos=window.VDM_CONTENT_DATA.photos||{items:[],albums:[]};if(window.VDM_APP_DATA)Object.assign(window.VDM_CONTENT_DATA.photos,window.VDM_APP_DATA);})();
