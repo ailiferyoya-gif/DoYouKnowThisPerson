@@ -265,6 +265,9 @@
   }
 
   function render() {
+    const previousList = root.querySelector("[data-message-list]");
+    const previousTop = previousList ? previousList.scrollTop : 0;
+    const wasNearEnd = !previousList || previousList.scrollHeight - previousList.scrollTop - previousList.clientHeight < 96;
     if (S.active && !conversation(S.active)) S.active = null;
     root.innerHTML = '<section class="link-shell">' + rail() + conversationList() + (S.tab === "chats" ? chat(conversation(S.active)) : S.tab === "calls" ? callsPanel() : S.tab === "contacts" ? contactsPanel() : savedPanel()) + callOverlay() + '</section>';
     filterConversationRows();
@@ -272,7 +275,7 @@
     ensureCallTimer();
     requestAnimationFrame(() => {
       const list = root.querySelector("[data-message-list]");
-      if (list && !S.chatQuery) list.scrollTop = list.scrollHeight;
+      if (list && !S.chatQuery) list.scrollTop = wasNearEnd ? list.scrollHeight : previousTop;
     });
   }
 
@@ -393,7 +396,10 @@
     const item = attachments && attachments[Number(index) || 0];
     if (!item) return;
     ATT.open(item);
-    VDMEvidence.observe(message, "open-attachment");
+    VDMEvidence.observe(Object.assign({}, item, {
+      sourceId: item.sourceId || item.id || item.name || `${messageId}:${index}`,
+      medium: item.medium || "line"
+    }), "open-attachment");
   }
 
   function findCall(id) {

@@ -1,0 +1,166 @@
+/* Desktop viewport corrections loaded after desktop.css. */
+
+#task-list {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+
+#task-list::-webkit-scrollbar {
+  display: none;
+}
+
+#task-list button {
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.start-button,
+.case-console-task,
+.system-tray {
+  flex: 0 0 auto;
+}
+
+.app-window.maximized {
+  inset: 0 !important;
+}
+
+.start-menu {
+  max-height: calc(100dvh - var(--task) - 20px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+dialog {
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+}
+
+html[data-ending="A"] #desktop {
+  background-image: radial-gradient(circle at 72% 18%, rgba(158, 188, 229, .24), transparent 34%);
+}
+
+html[data-ending="B"] #desktop {
+  background-image: linear-gradient(145deg, rgba(34, 65, 94, .18), rgba(27, 35, 48, .08));
+}
+
+html[data-ending="C"] #desktop {
+  filter: saturate(.28) contrast(.96);
+}
+
+html[data-ending="C"] .app-icon:not([data-open-app="search"]):not([data-open-app="settings"]) {
+  opacity: .48;
+}
+
+.top-route-host header {
+  display: flex;
+  height: 44px;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 0 14px;
+  border-bottom: 1px solid #dbe3ee;
+  background: #f7f9fe;
+  color: #182238;
+}
+
+.top-route-host header strong,
+.top-route-host header span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-route-host header span {
+  flex: 1 1 auto;
+  color: #637087;
+}
+
+.top-route-host header button {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #182238;
+}
+
+@media (max-width: 720px) {
+  .app-window,
+  .app-window.maximized {
+    inset: auto !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+  }
+
+  .desktop-icons {
+    inset: 12px 0 var(--task) 12px;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, 86px);
+    grid-template-rows: none;
+    grid-auto-rows: 78px;
+    align-content: start;
+    gap: 6px;
+    padding: 0 8px 18px 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .app-icon {
+    width: 86px;
+    height: 74px;
+  }
+
+  .case-console-task {
+    max-width: 112px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #task-list button {
+    max-width: 112px;
+  }
+
+  .system-tray {
+    gap: 6px;
+    padding-inline: 6px;
+  }
+
+  .dialog-card dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  .taskbar {
+    padding-inline: 4px;
+  }
+
+  .case-console-task {
+    max-width: 92px;
+    padding-inline: 7px;
+  }
+
+  .system-tray > span {
+    display: none;
+  }
+}

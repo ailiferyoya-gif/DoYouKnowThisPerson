@@ -1,0 +1,510 @@
+/* Case-wide viewport corrections loaded after every app-specific stylesheet. */
+
+html,
+body,
+.app,
+.app-body {
+  min-width: 0;
+}
+
+.app-body {
+  overflow: hidden;
+  position: relative;
+}
+
+.search-shell,
+.browser,
+.link-shell,
+.ripple-shell,
+.mail-layout,
+.photos-layout,
+.audio-layout,
+.files-layout,
+.notes-layout,
+.settings-layout {
+  min-width: 0;
+  min-height: 0;
+}
+
+.content,
+.rail,
+.browser-page,
+.conversation-scroll,
+.message-list,
+.ripple-center,
+.ripple-left,
+.ripple-right,
+.mail-list,
+.mail-body,
+.photo-stage,
+.audio-layout .content,
+.audio-layout .list,
+.file-table,
+.detail-pane,
+.note-list,
+.settings-page {
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+/* Ending consequences are status overlays, not extra grid rows. */
+.ending-app-effect {
+  position: absolute;
+  z-index: 40;
+  top: 10px;
+  right: 12px;
+  display: grid;
+  width: min(420px, calc(100% - 24px));
+  gap: 3px;
+  padding: 11px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  color: var(--ink);
+  box-shadow: 0 14px 36px rgba(18, 28, 48, .22);
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+
+.ending-app-effect span {
+  color: var(--muted);
+  font-size: .84rem;
+  line-height: 1.45;
+}
+
+.ending-app-effect.ending-c {
+  border-color: #716f78;
+  filter: saturate(.35);
+}
+
+/* Search owns one full-height scrolling view at a time. */
+.search-shell {
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.search-shell > .content,
+.search-shell > .search-home {
+  min-width: 0;
+  min-height: 0;
+}
+
+.search-home {
+  overflow: auto;
+}
+
+.search-box,
+.search-box input,
+.results-layout,
+.results-layout > * {
+  min-width: 0;
+}
+
+.search-box {
+  max-width: 100%;
+}
+
+.result,
+.result-path,
+.result h3,
+.result p,
+.history-row,
+.knowledge {
+  overflow-wrap: anywhere;
+}
+
+/* Keep every browser control available without allowing the address row to spill. */
+.browser,
+.browser-chrome,
+.browser-page,
+.browser-row,
+.tab-strip {
+  min-width: 0;
+}
+
+.browser {
+  min-height: 0;
+}
+
+.browser-chrome {
+  overflow: hidden;
+}
+
+.browser-chrome > .browser-row > form.browser-row {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.address {
+  width: 0;
+  min-width: 0;
+}
+
+.tab-strip {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.tab {
+  min-width: 72px;
+  flex: 0 1 220px;
+  white-space: nowrap;
+}
+
+.browser-page {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+.browser-page :where(h1, h2, h3, p, dd, td, a, button) {
+  overflow-wrap: anywhere;
+}
+
+/* Mail */
+.mail-layout,
+.mail-folders,
+.mail-list,
+.mail-body,
+.mail-row > span {
+  min-width: 0;
+  min-height: 0;
+}
+
+.mail-body,
+.mail-content,
+.mail-header,
+.quoted,
+.attachment {
+  overflow-wrap: anywhere;
+}
+
+/* Photos */
+.photos-layout,
+.photo-viewer,
+.photo-stage,
+.photo-info,
+.compare {
+  min-width: 0;
+  min-height: 0;
+}
+
+.photo-viewer {
+  overflow: hidden;
+}
+
+.photo-stage {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.photo-stage img {
+  transform-origin: top left;
+}
+
+.photo-info {
+  max-height: 48dvh;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+.compare img {
+  min-width: 0;
+  height: auto;
+}
+
+/* Audio */
+.audio-layout,
+.audio-layout .rail,
+.audio-layout .content,
+.audio-layout .list,
+.player,
+.audio-row > span {
+  min-width: 0;
+  min-height: 0;
+}
+
+.player {
+  width: 100%;
+}
+
+.transcript,
+.player p,
+.audio-row {
+  overflow-wrap: anywhere;
+}
+
+/* Files */
+.files-layout,
+.file-table,
+.detail-pane,
+.file-row > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+.detail-pane img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.file-preview {
+  max-width: 100%;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+.file-row strong,
+.detail-pane,
+.breadcrumb {
+  overflow-wrap: anywhere;
+}
+
+.breadcrumb .field {
+  min-width: 0;
+}
+
+/* Settings */
+.settings-layout,
+.settings-page,
+.setting-row,
+.info-grid,
+.info-grid dd {
+  min-width: 0;
+  min-height: 0;
+}
+
+.info-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Media opened from Mail, Link, Ripple and Files must remain dismissible. */
+dialog.media-dialog {
+  width: min(920px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+dialog.media-dialog::backdrop {
+  background: rgba(10, 16, 28, .72);
+  backdrop-filter: blur(8px);
+}
+
+.media-dialog .media-close {
+  position: sticky;
+  z-index: 2;
+  top: 8px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  margin: 8px 8px 0 auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .94);
+  color: var(--ink);
+  box-shadow: 0 8px 22px rgba(18, 32, 58, .16);
+}
+
+.media-dialog [data-media-body] {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  padding: 0 18px 18px;
+  overflow: auto;
+}
+
+.media-dialog img,
+.media-dialog audio,
+.media-dialog pre {
+  display: block;
+  max-width: 100%;
+}
+
+.media-dialog img {
+  width: auto;
+  height: auto;
+  max-height: calc(100dvh - 132px);
+  margin-inline: auto;
+  object-fit: contain;
+}
+
+.media-dialog audio {
+  width: 100%;
+}
+
+.media-dialog pre {
+  max-height: 65dvh;
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.media-dialog p {
+  margin: 0;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+/* The admin preset keeps its table scroll local on phones. */
+@media (max-width: 700px) {
+  .site-admin > main {
+    min-width: 0;
+    padding: 18px 14px;
+  }
+
+  .site-admin main > header {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .site-admin main > header form {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .site-admin main > header input {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .site-admin table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+}
+
+@media (max-width: 720px) {
+  .mail-layout {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .mail-folders {
+    min-height: 0;
+    flex-wrap: nowrap;
+    overscroll-behavior-inline: contain;
+  }
+
+  .mail-folders > button {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 620px) {
+  .photos-layout,
+  .settings-layout {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .photos-layout .rail,
+  .settings-layout .rail {
+    min-height: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .photos-layout .rail > button,
+  .settings-layout .rail > button {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .audio-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(132px, 42%) minmax(0, 1fr);
+  }
+
+  .audio-layout .rail {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 4px;
+    padding: 8px;
+    overflow: hidden;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .audio-layout .rail > button {
+    width: auto;
+    min-width: 0;
+    padding-inline: 6px;
+    justify-content: center;
+  }
+
+  .audio-layout .rail .list {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .audio-layout .content {
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .player {
+    margin: 0 auto;
+    padding: 12px;
+  }
+
+  .photo-info {
+    max-height: 46dvh;
+  }
+
+  .info-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+
+@media (max-width: 420px) {
+  .browser-chrome {
+    padding-inline: 7px;
+  }
+
+  .browser-row {
+    gap: 4px;
+  }
+
+  .browser-row button {
+    min-width: 36px;
+  }
+
+  .browser-chrome > .browser-row > form.browser-row {
+    flex-basis: 116px;
+  }
+
+  .browser-chrome > .browser-row > form .primary {
+    padding-inline: 8px;
+  }
+
+  dialog.media-dialog {
+    width: calc(100vw - 12px);
+    max-width: calc(100vw - 12px);
+    max-height: calc(100dvh - 12px);
+  }
+}
