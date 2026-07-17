@@ -6,7 +6,11 @@
   const I = VDMIcons;
   const ATT = VDMLocalAttachment;
   const root = document.getElementById("app-body");
-  const viewer = Object.assign({ id: "local-viewer", name: "ローカル利用者", handle: "local", bio: "この端末内のプロフィール" }, D.viewer || {});
+  const endingAtBoot = A.state?.get?.().ending || null;
+  const baseAccounts = Array.isArray(D.accounts) ? D.accounts : [];
+  const baseViewer = Object.assign({ id: "local-viewer", name: "ローカル利用者", handle: "local", bio: "この端末内のプロフィール" }, D.viewer || {});
+  const chihiroProfile = baseAccounts.find((item) => item.id === "chihiro") || {};
+  const viewer = endingAtBoot === "A" ? Object.assign({}, baseViewer, chihiroProfile, { id: baseViewer.id, name: "藤崎千尋", handle: "chihiro_archive", bio: chihiroProfile.bio || "霧川市の古いページと写真を整理しています。", status: "public" }) : baseViewer;
   const brand = Object.assign({ name: "Ripple", description: "短い投稿とつながり", accent: "#5d5bd6", mark: "ripple" }, A.brand || {});
   const defaults = {
     view: "home",
@@ -40,10 +44,10 @@
 
   const icon = (name, className) => I.icon(name, className);
   const save = () => A.saveAppState(S);
-  const baseAccounts = Array.isArray(D.accounts) ? D.accounts : [];
-  const allAccounts = () => [viewer, ...baseAccounts.filter((item) => item.id !== viewer.id)];
-  const account = (id) => allAccounts().find((item) => item.id === id) || { id, name: "削除されたアカウント", handle: "removed", status: "deleted", bio: "" };
-  const allPosts = () => [...(S.localPosts || []), ...(D.posts || [])];
+  const allAccounts = () => [viewer, ...baseAccounts.filter((item) => item.id !== viewer.id && !(endingAtBoot === "A" && item.id === "chihiro"))];
+  const account = (id) => endingAtBoot === "A" && id === "chihiro" ? viewer : allAccounts().find((item) => item.id === id) || { id, name: "削除されたアカウント", handle: "removed", status: "deleted", bio: "" };
+  const projectPost = (item) => endingAtBoot === "A" && item.authorId === "chihiro" ? Object.assign({}, item, { authorId: viewer.id }) : item;
+  const allPosts = () => [...(endingAtBoot === "C" ? [] : (S.localPosts || [])), ...(D.posts || [])].map(projectPost);
   const postById = (id) => allPosts().find((item) => item.id === id);
   const postBody = (post) => String(post && (post.body || post.text) || "");
   const initials = (value) => String(value || "?").trim().slice(0, 1).toUpperCase();
@@ -54,8 +58,9 @@
     return new Intl.DateTimeFormat("ja-JP", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
   };
   const avatar = (user, large) => '<span class="ripple-avatar' + (large ? ' ripple-avatar--large' : '') + '" data-tone="' + A.esc(String(user && user.tone || 0)) + '" aria-hidden="true">' + A.esc(initials(user && user.name)) + '</span>';
-  const isAvailable = (item) => !item.availableWhen || (window.VDMContent && VDMContent.available ? VDMContent.available(item) : true);
-  const unreadNotifications = () => (D.notifications || []).filter((item) => !S.readNotifications.includes(item.id)).length;
+  const isAvailable = (item) => !item.availableWhen || Boolean(A.state?.hasEvidence?.(item.availableWhen));
+  const notifications = () => endingAtBoot === "C" ? [] : (D.notifications || []).filter(isAvailable);
+  const unreadNotifications = () => notifications().filter((item) => !S.readNotifications.includes(item.id)).length;
 
   function renderRichText(value) {
     return A.esc(value).replace(/(^|\s)([@#][\p{L}\p{N}_-]+)/gu, '$1<span class="ripple-token" role="button" tabindex="0" data-social-token="$2">$2</span>');
@@ -205,7 +210,7 @@
   const notificationIcons = { mention: "profile", reply: "reply", like: "like", repost: "repost", follow: "contacts", quote: "quote" };
 
   function notificationsView() {
-    const source = (D.notifications || []).filter((item) => S.notificationTab === "all" || item.type === "mention");
+    const source = notifications().filter((item) => S.notificationTab === "all" || item.type === "mention");
     return header("通知") + '<div class="home-tabs" role="tablist"><button type="button" data-notification-tab="all" role="tab" aria-selected="' + String(S.notificationTab === 'all') + '">すべて</button><button type="button" data-notification-tab="mention" role="tab" aria-selected="' + String(S.notificationTab === 'mention') + '">メンション</button></div><section class="notification-list">' + (source.map((item) => {
       const read = S.readNotifications.includes(item.id);
       const user = account(item.actorId || item.userId);
@@ -246,7 +251,7 @@
 
   function rightSidebar() {
     const trends = (D.trends || []).slice(0, 5);
-    const suggestions = baseAccounts.filter((user) => user.status === "public" && user.id !== viewer.id).slice(0, 3);
+    const suggestions = allAccounts().filter((user) => user.status === "public" && user.id !== viewer.id).slice(0, 3);
     return '<aside class="ripple-right"><form class="side-search" data-side-search>' + icon("search") + '<label><span class="sr-only">話題を検索</span><input type="search" name="query" placeholder="' + A.esc(brand.name) + 'を検索"></label></form><section class="side-panel"><h2>いま話題</h2>' + trends.map((trend, index) => '<button type="button" data-search-query="' + A.esc(typeof trend === 'string' ? trend : trend.label) + '"><small>' + (index + 1) + ' · ローカル</small><strong>' + A.esc(typeof trend === 'string' ? trend : trend.label) + '</strong><span>' + A.esc(typeof trend === 'string' ? '通常の話題' : trend.note || '') + '</span></button>').join("") + '</section><section class="side-panel suggestions"><h2>おすすめユーザー</h2>' + suggestions.map((user) => '<div>' + avatar(user) + '<button type="button" data-open-profile="' + A.esc(user.id) + '"><strong>' + A.esc(user.name) + '</strong><small>@' + A.esc(user.handle) + '</small></button><button type="button" class="mini-follow" data-follow="' + A.esc(user.id) + '">' + (S.following.includes(user.id) ? '中' : '＋') + '</button></div>').join("") + '</section><footer><span>この端末内の架空サービス</span><button type="button" data-side-info>利用案内</button><button type="button" data-side-info>プライバシー</button></footer></aside>';
   }
 
@@ -382,10 +387,11 @@
   }
 
   function openNotification(id) {
-    const item = (D.notifications || []).find((notification) => notification.id === id);
-    if (!item) return;
+    const item = notifications().find((notification) => notification.id === id);
+    if (!item || !isAvailable(item)) return;
     if (!S.readNotifications.includes(id)) S.readNotifications.push(id);
     save();
+    VDMEvidence.observe(item, "open-notification");
     if (item.postId) openPost(item.postId);
     else if (item.profileId || item.actorId || item.userId) openProfile(item.profileId || item.actorId || item.userId);
     else render();
@@ -501,7 +507,13 @@
 
   window.addEventListener("vdm-open-payload", (event) => {
     const detail = event.detail || {};
-    if (detail.postId) openPost(detail.postId);
+    if (["home", "explore", "notifications", "bookmarks", "profile"].includes(detail.view)) {
+      S.view = detail.view;
+      S.detail = null;
+      S.profileUserId = detail.view === "profile" ? viewer.id : null;
+      save();
+      render();
+    } else if (detail.postId) openPost(detail.postId);
     else if (detail.profileId) openProfile(detail.profileId);
     else if (detail.query) performSearch(detail.query);
   });

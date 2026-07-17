@@ -1,11 +1,191 @@
-(function(global){
-"use strict";
-const status=(root,text)=>{let node=root.querySelector("[data-site-status]");if(!node){node=document.createElement("p");node.dataset.siteStatus="";node.className="pill";node.setAttribute("role","status");root.querySelector("main")?.prepend(node);}node.textContent=text;};
-const localBlobUrl=blob=>URL.createObjectURL(blob);global.localBlobUrl=global.localBlobUrl||localBlobUrl;
-function bindAdmin(root){const rows=[...root.querySelectorAll("[data-admin-row]")],detail=root.querySelector(".admin-detail");root.querySelector("[data-admin-search]")?.addEventListener("submit",e=>{e.preventDefault();const q=e.currentTarget.querySelector("input").value;rows.forEach(row=>row.hidden=q&&!VDMText.includesAll(row.textContent,q));status(root,q?"検索結果を更新しました":"すべての記録を表示します");});root.querySelectorAll("[data-admin-filter]").forEach((button,index)=>button.onclick=()=>{rows.forEach(row=>row.hidden=index>0&&!VDMText.includesAll(row.textContent,button.textContent));status(root,button.textContent+"で絞り込みました");});rows.forEach(row=>{row.tabIndex=0;row.onclick=()=>{detail.innerHTML="<h2>詳細</h2><p>"+row.textContent.trim()+"</p>";rows.forEach(x=>x.removeAttribute("aria-selected"));row.setAttribute("aria-selected","true");};row.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();row.click();}};});}
-function bindBoard(root,context){const form=root.querySelector(".board-compose"),list=root.querySelector(".thread-list");root.querySelector("[data-board-submit]")?.addEventListener("click",()=>{const name=form.querySelector("[name=name]").value.trim()||"匿名",text=form.querySelector("[name=text]").value.trim();if(!text){status(root,"本文を入力してください");return;}const number=list.children.length+1,li=document.createElement("li");li.id="post-"+number;li.innerHTML='<div><span class="post-number">#'+number+'</span><strong></strong><small>ID:local '+new Date().toLocaleString("ja-JP")+'</small></div><p></p><button data-report="'+number+'">報告</button>';li.querySelector("strong").textContent=name;li.querySelector("p").textContent=text;list.appendChild(li);context.appState.siteLocal=context.appState.siteLocal||{};(context.appState.siteLocal.boardPosts||(context.appState.siteLocal.boardPosts=[])).push({number,name,text});context.save();form.reset();wireReport(li.querySelector("[data-report]"));status(root,"端末内に投稿しました");});const wireReport=button=>button.onclick=()=>{button.textContent="報告済み";button.disabled=true;status(root,"この端末内で報告済みにしました");};root.querySelectorAll("[data-report]").forEach(wireReport);root.querySelectorAll("[data-board-page]").forEach(button=>button.onclick=()=>{root.querySelectorAll("[data-board-page]").forEach(x=>x.removeAttribute("aria-current"));button.setAttribute("aria-current","page");status(root,"ページ "+button.dataset.boardPage+" を選択しました");});}
-function bindArchive(root){const records=[...root.querySelectorAll("[data-archive-record]")],form=root.querySelector(".site-archive form");if(form)form.onsubmit=e=>{e.preventDefault();const values=[...new FormData(form).values()].filter(v=>v&&v!=="すべて");records.forEach(record=>record.hidden=values.some(value=>!VDMText.includesAll(record.textContent,value)));status(root,records.filter(x=>!x.hidden).length+"件を表示しています");};records.forEach(record=>{record.tabIndex=0;record.onclick=e=>{if(e.target.closest("button"))return;records.forEach(x=>x.removeAttribute("aria-selected"));record.setAttribute("aria-selected","true");status(root,record.dataset.archiveRecord+"を選択しました");};record.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();record.click();}};record.querySelector("[data-archive-export]")?.addEventListener("click",()=>{const blob=new Blob([record.innerText],{type:"text/plain;charset=utf-8"}),a=document.createElement("a");a.href=localBlobUrl(blob);const url=a.href;a.download=(record.dataset.archiveRecord||"record")+".txt";a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);status(root,"選択した記録を書き出しました");});});}
-function bindBlog(root){const posts=[...root.querySelectorAll(".blog-post")];root.querySelectorAll("[data-blog-filter]").forEach(button=>button.onclick=()=>{const [kind,value]=button.dataset.blogFilter.split(":");posts.forEach(post=>post.hidden=!VDMText.includesAll(post.textContent,value));status(root,(kind==="archive"?"月別":"カテゴリ")+"「"+value+"」で絞り込みました");});}
-function bind(root,context){if(root.querySelector(".site-admin"))bindAdmin(root);if(root.querySelector(".site-board"))bindBoard(root,context||{appState:{},save(){}});if(root.querySelector(".site-archive"))bindArchive(root);if(root.querySelector(".site-blog"))bindBlog(root);}
-global.VDMSiteInteractions={bind};
+(function (global) {
+  "use strict";
+
+  const status = (root, text) => {
+    let node = root.querySelector("[data-site-status]");
+    if (!node) {
+      node = document.createElement("p");
+      node.dataset.siteStatus = "";
+      node.className = "site-status";
+      node.setAttribute("role", "status");
+      (root.querySelector("main") || root).prepend(node);
+    }
+    node.textContent = text;
+  };
+  const matches = (text, query) => !query || (global.VDMText ? global.VDMText.includesAll(text, query) : String(text).toLowerCase().includes(String(query).toLowerCase()));
+  const localBlobUrl = (blob) => URL.createObjectURL(blob);
+  global.localBlobUrl = global.localBlobUrl || localBlobUrl;
+
+  function bindMenu(root) {
+    const button = root.querySelector("[data-site-menu]");
+    const navigation = root.querySelector("[data-site-nav]");
+    if (!button || !navigation) return;
+    button.addEventListener("click", () => {
+      const open = navigation.classList.toggle("is-open");
+      button.setAttribute("aria-expanded", String(open));
+    });
+    navigation.addEventListener("click", (event) => {
+      if (!event.target.closest("a")) return;
+      navigation.classList.remove("is-open");
+      button.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  function bindDirectory(root) {
+    root.querySelectorAll("[data-site-directory]").forEach((directory) => {
+      const form = directory.querySelector("[data-site-directory-search]");
+      const input = form && form.querySelector("[name=q]");
+      const results = directory.querySelector("[data-site-search-results]");
+      const items = [...directory.querySelectorAll("[data-site-filter-item]")];
+      const empty = directory.querySelector("[data-site-filter-empty]");
+      if (!form || !input || !results) return;
+      const filter = () => {
+        const query = input.value.trim();
+        let count = 0;
+        items.forEach((item) => {
+          item.hidden = !matches(item.dataset.filterText || item.textContent, query);
+          if (!item.hidden) count += 1;
+        });
+        results.hidden = false;
+        if (empty) empty.hidden = count !== 0;
+        status(root, query ? "サイト内検索：" + count + "件" : "サイト内の全ページを表示しています");
+      };
+      form.addEventListener("submit", (event) => { event.preventDefault(); filter(); });
+      input.addEventListener("input", () => { if (!results.hidden) filter(); });
+      if (input.value) filter();
+    });
+  }
+
+  function bindLocalFilter(root) {
+    root.querySelectorAll("[data-site-local-filter]").forEach((form) => {
+      const input = form.querySelector("[name=q]");
+      if (!input) return;
+      const candidates = root.matches(".cache-blog-site") ? [...root.querySelectorAll(".blog-post")] : [...root.querySelectorAll("[data-local-filter-list] [data-site-filter-item]")];
+      const empty = root.querySelector("[data-local-filter-list] [data-site-filter-empty]");
+      const filter = () => {
+        const query = input.value.trim();
+        let count = 0;
+        candidates.forEach((item) => {
+          item.hidden = !matches(item.dataset.filterText || item.textContent, query);
+          if (!item.hidden) count += 1;
+        });
+        if (empty) empty.hidden = count !== 0;
+        status(root, query ? "絞り込み結果：" + count + "件" : "すべて表示しています");
+      };
+      form.addEventListener("submit", (event) => { event.preventDefault(); filter(); });
+      input.addEventListener("input", filter);
+    });
+  }
+
+  function bindCatalog(root) {
+    const records = [...root.querySelectorAll("[data-archive-record]")];
+    const form = root.querySelector("[data-catalog-filter]");
+    const count = root.querySelector("[data-catalog-count]");
+    const empty = root.querySelector(".catalog-records [data-site-filter-empty]");
+    if (form) {
+      const filter = () => {
+        const values = [...new FormData(form).values()].map(String).filter((value) => value && value !== "すべて");
+        let visible = 0;
+        records.forEach((record) => {
+          record.hidden = values.some((value) => !matches(record.dataset.filterText || record.textContent, value));
+          if (!record.hidden) visible += 1;
+        });
+        if (count) count.textContent = visible + "件";
+        if (empty) empty.hidden = visible !== 0;
+        status(root, visible + "件を表示しています");
+      };
+      form.addEventListener("submit", (event) => { event.preventDefault(); filter(); });
+      form.addEventListener("change", filter);
+      if (form.querySelector("[name=q]")?.value) filter();
+    }
+    records.forEach((record) => {
+      record.tabIndex = 0;
+      const select = () => {
+        records.forEach((item) => item.removeAttribute("aria-selected"));
+        record.setAttribute("aria-selected", "true");
+        status(root, record.dataset.archiveRecord + "を選択しました");
+      };
+      record.addEventListener("click", (event) => { if (!event.target.closest("a,button")) select(); });
+      record.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); select(); } });
+      record.querySelector("[data-archive-export]")?.addEventListener("click", () => {
+        const blob = new Blob([record.innerText], { type: "text/plain;charset=utf-8" });
+        const anchor = document.createElement("a");
+        anchor.href = localBlobUrl(blob);
+        const url = anchor.href;
+        anchor.download = (record.dataset.archiveRecord || "record") + ".txt";
+        anchor.click();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+        status(root, "目録テキストを書き出しました");
+      });
+    });
+  }
+
+  function bindBoard(root, context) {
+    const form = root.querySelector(".board-compose");
+    const thread = root.querySelector(".thread-list");
+    const wireReport = (button) => {
+      button.addEventListener("click", () => {
+        button.textContent = "報告済み";
+        button.disabled = true;
+        status(root, "この端末内で報告済みにしました");
+      }, { once: true });
+    };
+    root.querySelectorAll("[data-report]").forEach(wireReport);
+    root.querySelector("[data-board-submit]")?.addEventListener("click", () => {
+      if (!form || !thread) return;
+      const name = form.querySelector("[name=name]").value.trim() || "匿名";
+      const text = form.querySelector("[name=text]").value.trim();
+      if (!text) { status(root, "本文を入力してください"); return; }
+      const number = thread.children.length + 1;
+      const item = document.createElement("li");
+      item.id = "post-" + number;
+      item.innerHTML = '<header><span class="post-number">#' + number + '</span><strong></strong><small>ID:local ' + new Date().toLocaleString("ja-JP") + '</small></header><p></p><button type="button" data-report="' + number + '">報告</button>';
+      item.querySelector("strong").textContent = name;
+      item.querySelector("p").textContent = text;
+      thread.appendChild(item);
+      context.appState.siteLocal = context.appState.siteLocal || {};
+      (context.appState.siteLocal.boardPosts || (context.appState.siteLocal.boardPosts = [])).push({ number, name, text });
+      context.save();
+      form.reset();
+      wireReport(item.querySelector("[data-report]"));
+      status(root, "端末内に投稿しました");
+    });
+  }
+
+  function monthKey(value) {
+    const match = String(value || "").match(/(\d{4})\D*(\d{1,2})/);
+    return match ? match[1] + "-" + String(Number(match[2])).padStart(2, "0") : "";
+  }
+
+  function sameBlogPeriod(date, value) {
+    const expectedMonth = monthKey(value);
+    if (expectedMonth) return monthKey(date) === expectedMonth;
+    const year = String(value || "").match(/\d{4}/)?.[0];
+    return Boolean(year && String(date || "").startsWith(year));
+  }
+
+  function bindBlog(root) {
+    const posts = [...root.querySelectorAll(".blog-post")];
+    root.querySelectorAll("[data-blog-filter]").forEach((button) => button.addEventListener("click", () => {
+      const [kind, value] = button.dataset.blogFilter.split(":");
+      let count = 0;
+      posts.forEach((post) => {
+        const hit = kind === "month" ? sameBlogPeriod(post.dataset.blogDate, value) : matches(post.dataset.blogTags || "", value);
+        post.hidden = !hit;
+        if (hit) count += 1;
+      });
+      status(root, (kind === "month" ? "年月" : "カテゴリ") + "「" + button.textContent.trim() + "」：" + count + "件");
+    }));
+  }
+
+  function bind(root, context) {
+    bindMenu(root);
+    bindDirectory(root);
+    bindLocalFilter(root);
+    if (root.matches(".university-site")) bindCatalog(root);
+    if (root.matches(".bbs-site")) bindBoard(root, context || { appState: {}, save() {} });
+    if (root.matches(".cache-blog-site")) bindBlog(root);
+  }
+
+  global.VDMSiteInteractions = { bind };
 })(window);

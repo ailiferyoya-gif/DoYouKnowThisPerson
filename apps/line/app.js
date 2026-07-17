@@ -6,7 +6,11 @@
   const I = VDMIcons;
   const ATT = VDMLocalAttachment;
   const root = document.getElementById("app-body");
-  const conversations = Array.isArray(D.conversations) ? D.conversations : [];
+  const endingAtBoot = A.state?.get?.().ending || null;
+  const endingName = (id, name) => endingAtBoot === "A" && id === "unknown" ? "藤崎千尋" : name;
+  const projectConversation = (item) => Object.assign({}, item, { name: endingName(item.id, item.name) });
+  const projectCall = (item) => Object.assign({}, item, { name: endingName(item.conversationId, item.name) });
+  const conversations = Array.isArray(D.conversations) ? D.conversations.map(projectConversation) : [];
   const brand = Object.assign({ name: "Link", description: "メッセージと通話", accent: "#287c78", mark: "link" }, A.brand || {});
   const defaults = {
     tab: "chats",
@@ -42,7 +46,9 @@
   let callTimer = 0;
   const icon = (name, className) => I.icon(name, className);
   const save = () => A.saveAppState(S);
-  const conversation = (id) => conversations.find((item) => item.id === id);
+  const isAvailable = (item) => !item || !item.availableWhen || Boolean(A.state?.hasEvidence?.(item.availableWhen));
+  const visibleConversations = () => conversations.filter(isAvailable);
+  const conversation = (id) => visibleConversations().find((item) => item.id === id);
   const nowTime = () => new Intl.DateTimeFormat("ja-JP", { hour: "2-digit", minute: "2-digit" }).format(new Date());
   const nowDate = () => new Intl.DateTimeFormat("ja-JP", { month: "short", day: "numeric" }).format(new Date());
   const messageText = (message) => String(message && (message.text || message.body) || "");
@@ -58,7 +64,9 @@
 
   function allMessages(item) {
     if (!item) return [];
-    return [...(item.messages || []), ...(S.localMessages[item.id] || [])];
+    return [...(item.messages || []), ...(S.localMessages[item.id] || [])].filter((message) => {
+      return !message.availableWhen || Boolean(A.state?.hasEvidence?.(message.availableWhen));
+    });
   }
 
   function unreadCount(item) {
@@ -92,7 +100,7 @@
   }
 
   function rail() {
-    const unread = conversations.reduce((sum, item) => sum + unreadCount(item), 0);
+    const unread = visibleConversations().reduce((sum, item) => sum + unreadCount(item), 0);
     const missed = callRows().filter((item) => item.status === "missed").length;
     return '<nav class="link-apprail" aria-label="' + A.esc(brand.name) + ' の機能">' +
       '<div class="link-brand" aria-label="' + A.esc(brand.name) + '"><span class="link-brand-mark">' + icon("chat") + '</span><strong>' + A.esc(brand.name) + '</strong></div>' +
@@ -107,7 +115,8 @@
   }
 
   function conversationList() {
-    const sorted = [...conversations].sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+    const availableConversations = visibleConversations();
+    const sorted = [...availableConversations].sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
     const rows = sorted.map((item, index) => {
       const messages = allMessages(item);
       const last = messages[messages.length - 1];
@@ -121,7 +130,7 @@
         '</button>';
     }).join("");
     return '<section class="conversation-pane ' + (S.mobile === "list" && S.tab === "chats" ? 'mobile-active' : '') + '" aria-label="会話一覧">' +
-      '<header class="conversation-pane-head"><div><h1>トーク</h1><small>' + conversations.length + '件</small></div><div class="header-actions"><button class="link-icon-button" type="button" data-new-chat aria-label="新しい会話">' + icon("compose") + '</button><button class="link-icon-button" type="button" data-local-menu aria-label="メニュー">' + icon("more") + '</button></div></header>' +
+      '<header class="conversation-pane-head"><div><h1>トーク</h1><small>' + availableConversations.length + '件</small></div><div class="header-actions"><button class="link-icon-button" type="button" data-new-chat aria-label="新しい会話">' + icon("compose") + '</button><button class="link-icon-button" type="button" data-local-menu aria-label="メニュー">' + icon("more") + '</button></div></header>' +
       '<label class="link-search">' + icon("search") + '<span class="sr-only">会話を検索</span><input type="search" data-conversation-search value="' + A.esc(S.conversationQuery) + '" placeholder="会話を検索"></label>' +
       '<div class="conversation-scroll" data-conversation-rows>' + (rows || '<div class="link-empty"><strong>トークはありません</strong><p>連絡先からローカル会話を始められます。</p></div>') + '</div>' +
       '<p class="link-local-note">' + icon("local") + ' 外部には送信されません</p>' +
@@ -150,7 +159,7 @@
     const grouped = previous && previous.sender === message.sender && previous.type !== "system" && message.type !== "system";
     const cancelled = S.unsent.includes(message.id) || message.type === "unsent";
     if (message.type === "system" || message.system) return '<p class="message-system" data-message="' + A.esc(message.id) + '">' + A.esc(messageText(message)) + '</p>';
-    if (message.type === "notification-remnant") return '<article class="notification-remnant" data-message="' + A.esc(message.id) + '">' + icon("notification") + '<span><strong>' + A.esc(message.title || "通知") + '</strong><small>' + A.esc(messageText(message)) + '</small></span></article>';
+    if (message.type === "notification-remnant") return '<article class="notification-remnant" data-message="' + A.esc(message.id) + '"><div class="notification-remnant-copy">' + icon("notification") + '<span><strong>' + A.esc(message.title || "通知") + '</strong><small>' + A.esc(messageText(message)) + '</small></span></div>' + messageAttachments(message) + '</article>';
     const quote = message.quoteId ? allMessages(item).find((candidate) => candidate.id === message.quoteId) : null;
     const menuOpen = S.messageMenu === message.id;
     return '<article class="message-row ' + (mine ? 'is-me ' : 'is-them ') + (grouped ? 'is-grouped ' : '') + (cancelled ? 'is-cancelled' : '') + '" data-message="' + A.esc(message.id) + '">' +
@@ -219,9 +228,10 @@
   const callLabels = { dialing: "発信中", ringing: "呼出し中", connected: "通話中", ended: "終了", incoming: "着信中", answered: "通話中", declined: "拒否", missed: "不在着信", voicemail: "留守番電話", completed: "完了", outgoing: "発信", incomingDirection: "着信" };
 
   function callRows() {
+    if (endingAtBoot === "C") return [];
     const merged = new Map();
     [...(D.calls || []), ...(S.calls || [])].forEach((item) => merged.set(item.id, Object.assign({}, merged.get(item.id) || {}, item)));
-    return [...merged.values()];
+    return [...merged.values()].map(projectCall);
   }
 
   function callDirectionIcon(item) {
@@ -241,14 +251,16 @@
   }
 
   function contactsPanel() {
-    const contacts = D.contacts && D.contacts.length ? D.contacts : conversations.map((item) => ({ conversationId: item.id, name: item.name, status: item.status, tone: item.tone }));
+    const availableConversationIds = new Set(visibleConversations().map((item) => item.id));
+    const contacts = (D.contacts && D.contacts.length ? D.contacts.map((item) => Object.assign({}, item, { name: endingName(item.conversationId || item.id, item.name) })) : conversations.map((item) => ({ conversationId: item.id, name: item.name, status: item.status, tone: item.tone })))
+      .filter((item) => availableConversationIds.has(item.conversationId || item.id));
     const filtered = contacts.filter((item) => VDMText.includesAll([item.name, item.status].join(" "), S.contactQuery));
     const rows = filtered.map((item, index) => '<article class="contact-row">' + avatar(item.name, item.tone == null ? index : item.tone) + '<span><strong>' + A.esc(item.name) + '</strong><small>' + A.esc(item.status || "ローカル記録") + '</small></span><div><button type="button" class="link-icon-button" data-contact-chat="' + A.esc(item.conversationId || item.id) + '" aria-label="トークを開く">' + icon("chat") + '</button><button type="button" class="link-icon-button" data-contact-call="' + A.esc(item.conversationId || item.id) + '" aria-label="通話を開始">' + icon("call") + '</button></div></article>').join("");
     return '<section class="link-page contacts-page ' + (S.mobile === "contacts" ? 'mobile-active' : '') + '"><header class="link-page-head"><div><button class="link-icon-button mobile-chat-back" type="button" data-mobile-back aria-label="戻る">' + icon("back") + '</button><h1>連絡先</h1><small>端末内の記録のみ</small></div></header><label class="link-search link-search--page">' + icon("search") + '<span class="sr-only">連絡先を検索</span><input type="search" data-contact-search value="' + A.esc(S.contactQuery) + '" placeholder="名前を検索"></label><div class="contact-list">' + (rows || '<div class="link-empty"><strong>連絡先がありません</strong></div>') + '</div><p class="privacy-note">' + icon("local") + '<span><strong>ローカル連絡先</strong><small>端末のアドレス帳には接続していません。</small></span></p></section>';
   }
 
   function savedPanel() {
-    const saved = (D.saved || []).map((item) => '<article class="saved-row">' + icon(item.kind === "audio" ? "audio" : item.kind === "image" ? "image" : "file") + '<span><strong>' + A.esc(item.title || item.name || "保存項目") + '</strong><small>' + A.esc(item.note || "この端末内") + '</small></span></article>').join("");
+    const saved = (endingAtBoot === "C" ? [] : (D.saved || [])).map((item) => '<article class="saved-row">' + icon(item.kind === "audio" ? "audio" : item.kind === "image" ? "image" : "file") + '<span><strong>' + A.esc(item.title || item.name || "保存項目") + '</strong><small>' + A.esc(item.note || "この端末内") + '</small></span></article>').join("");
     return '<section class="link-page saved-page ' + (S.mobile === "saved" ? 'mobile-active' : '') + '"><header class="link-page-head"><div><button class="link-icon-button mobile-chat-back" type="button" data-mobile-back aria-label="戻る">' + icon("back") + '</button><h1>保存済み</h1><small>あとで確認する項目</small></div></header><div class="saved-list">' + (saved || '<div class="link-empty">' + icon("saved") + '<strong>保存済み項目はありません</strong><p>ケース側のデータから追加できます。</p></div>') + '</div></section>';
   }
 
@@ -622,6 +634,21 @@
 
   root.addEventListener("change", (event) => {
     if (event.target.matches("[data-file-input]")) chooseAttachment(event.target);
+  });
+
+  window.addEventListener("vdm-open-payload", (event) => {
+    const detail = event.detail || {};
+    if (detail.conversationId) {
+      openConversation(String(detail.conversationId));
+      return;
+    }
+    if (["chats", "calls", "contacts", "saved"].includes(detail.tab)) {
+      S.tab = detail.tab;
+      S.mobile = detail.tab === "chats" ? "list" : detail.tab;
+      S.messageMenu = null;
+      save();
+      render();
+    }
   });
 
   window.addEventListener("beforeunload", () => window.clearInterval(callTimer));

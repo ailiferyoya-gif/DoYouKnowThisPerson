@@ -1,0 +1,20 @@
+<svg viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title desc">
+  <title id="title">この人を知っていますか？</title>
+  <desc id="desc">保存された断片を照合するローカル調査端末の記号</desc>
+  <defs>
+    <linearGradient id="case-bg" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#344a54"/>
+      <stop offset="1" stop-color="#17242c"/>
+    </linearGradient>
+    <linearGradient id="case-glint" x1="18" y1="14" x2="47" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e1f1ef"/>
+      <stop offset="1" stop-color="#8fb8b3"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#case-bg)"/>
+  <path d="M12 19.5c5-4.8 11.6-7.5 19-7.5 7.8 0 14.7 3 19.8 8.1" fill="none" stroke="#658781" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 4"/>
+  <circle cx="30" cy="30" r="13" fill="#1e3038" stroke="url(#case-glint)" stroke-width="4"/>
+  <circle cx="30" cy="30" r="5" fill="#c8dfdc"/>
+  <path d="m40 40 12 12" stroke="#c8dfdc" stroke-width="5" stroke-linecap="round"/>
+  <path d="m18 46 8-3 5 4 8-3" fill="none" stroke="#78a29d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

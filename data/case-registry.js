@@ -39,6 +39,8 @@
   const claims = {
     I1: {
       stage: "人物記録の照合", world: 2, min: 3, dependency: null,
+      currentObjective: "藤崎千尋が実在したことを、別の運営主体や私的記録で確認する。",
+      observationDirection: "同じ人物を、異なる組織と私的な記録の両方で確認してください。",
       evidenceIds: ["E01", "E02", "E03", "E04", "E05"],
       question: "市、大学、私信、記事、音声に残る記録は、同じ人物を指しているか。",
       options: [
@@ -51,6 +53,8 @@
     },
     I2: {
       stage: "改稿経路の照合", world: 3, min: 2, dependency: "I1",
+      currentObjective: "同じ人物の記録が、媒体をまたいで変化しているか確かめる。",
+      observationDirection: "同じページや写真の保存版と現在版、削除後に残った周辺情報を比べてください。",
       evidenceIds: ["E06", "E07", "E08", "E09"],
       question: "別々の媒体で起きた変更は、独立した削除として説明できるか。",
       options: [
@@ -63,6 +67,8 @@
     },
     I3: {
       stage: "制度目的の照合", world: 4, min: 2, dependency: "I2",
+      currentObjective: "公開情報を減らす制度が、何のために始まったのか整理する。",
+      observationDirection: "制度を説明する側と、申請した側の資料を分けて確認してください。",
       evidenceIds: ["E10", "E11", "E12", "E13"],
       question: "公開情報を減らす制度は、最初から記録隠しだけを目的にしていたか。",
       options: [
@@ -75,6 +81,8 @@
     },
     I4: {
       stage: "同意範囲の照合", world: 5, min: 3, dependency: "I3",
+      currentObjective: "申請された範囲と、実際に処理された範囲を比べる。",
+      observationDirection: "本人が指定した対象外の情報と、運用記録に現れる対象を照合してください。",
       evidenceIds: ["E11", "E14", "E15", "E16", "E17"],
       question: "実際の処理は、本人が申請した公開範囲に収まっているか。",
       options: [
@@ -87,6 +95,8 @@
     },
     I5: {
       stage: "関係参照の照合", world: 6, min: 2, dependency: "I4",
+      currentObjective: "補正が公開ページ以外の人間関係にも及ぶか確かめる。",
+      observationDirection: "本文が消えた後も、返信、通知、連絡経路に残る参照を確認してください。",
       evidenceIds: ["E17", "E18", "E19", "E20"],
       question: "補正対象は公開ページだけか、それとも人間関係にも及ぶか。",
       options: [
@@ -99,6 +109,8 @@
     },
     I6: {
       stage: "応答音声の照合", world: 6, min: 2, dependency: "I5",
+      currentObjective: "現在の応答を、その人の自由な証言として扱えるか判断する。",
+      observationDirection: "保存された応答と現在の応答を、言葉だけでなく間や訂正の位置まで比べてください。",
       evidenceIds: ["E21", "E22", "E23", "E24"],
       question: "現在の応答を、その人の自由な証言だけとして扱えるか。",
       options: [
@@ -111,6 +123,8 @@
     },
     I7: {
       stage: "端末経路の照合", world: 7, min: 2, dependency: "I6",
+      currentObjective: "この中古PCが、どのような意図で残されたのか整理する。",
+      observationDirection: "端末の処分理由と、保存設定や過去所有者の記録を別媒体で確認してください。",
       evidenceIds: ["E25", "E26", "E27", "E28"],
       question: "このPCは偶然中古市場へ流れたのか。",
       options: [
@@ -123,6 +137,8 @@
     },
     I8: {
       stage: "現在参照の照合", world: 8, min: 2, dependency: "I7",
+      currentObjective: "このPCと現在の利用者が、どのように接続されたか確かめる。",
+      observationDirection: "現在セッションの表示名が、どの記録に現れ、どこには存在しないか比べてください。",
       evidenceIds: ["E29", "E30", "E31", "E32"],
       question: "このPCは過去を保存するだけで、現在の利用者とは無関係か。",
       options: [

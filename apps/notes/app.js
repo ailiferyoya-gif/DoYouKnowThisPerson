@@ -1,7 +1,77 @@
-(function(){
-"use strict";const A=VDMApp,D=A.read("notes",{}),root=document.getElementById("app-body");A.frame(A.brand.name,A.brand.description);document.querySelector(".app-mark").textContent=A.brand.icon||"";const S=A.appState({active:null,query:"",local:[],deleted:[],mobile:"list"});let debounce;function save(){A.saveAppState(S);}const all=()=>[...S.local,...(D.items||[])].filter(x=>!S.deleted.includes(x.id));
-function render(){const list=all().filter(x=>VDMText.includesAll([x.title,x.body].join(" "),S.query)),x=all().find(i=>i.id===S.active);root.innerHTML='<section class="notes-layout"><aside class="note-list '+(S.mobile==="list"?"mobile-active":"")+'"><div class="toolbar"><button class="primary" data-new>新規メモ</button><input class="field" data-search value="'+A.esc(S.query)+'" placeholder="メモを検索"></div>'+list.map(n=>'<button class="note-row" data-note="'+n.id+'"><strong>'+A.esc(n.title||"無題")+'</strong><small>'+A.esc(String(n.body||"").slice(0,48))+'</small></button>').join('')+'</aside><main class="note-editor '+(S.mobile==="editor"?"mobile-active":"")+'">'+(x?'<div class="toolbar"><button class="ghost mobile-only" data-back>←</button><button class="ghost" data-delete>削除</button><span>'+String(x.body||"").length+' / '+(x.maxLength||5000)+'</span></div><input class="note-title" data-title value="'+A.esc(x.title||"")+'" maxlength="100"><textarea class="note-text" data-body maxlength="'+(x.maxLength||5000)+'">'+A.esc(x.body||"")+'</textarea><div class="note-status" data-status>保存済み</div>':'<div class="empty">メモを選択してください</div>')+'</main></section>';bind(x);}
-function update(x,patch){if(!S.local.some(n=>n.id===x.id))S.local.unshift(Object.assign({},x));const local=S.local.find(n=>n.id===x.id);Object.assign(local,patch,{updatedAt:new Date().toISOString()});clearTimeout(debounce);root.querySelector("[data-status]").textContent="保存中…";debounce=setTimeout(()=>{save();root.querySelector("[data-status]")&&(root.querySelector("[data-status]").textContent="保存済み");},350);}
-function bind(x){root.querySelector("[data-new]").onclick=()=>{const n={id:"note-"+Date.now(),title:"無題",body:"",createdAt:new Date().toISOString(),maxLength:5000};S.local.unshift(n);S.active=n.id;S.mobile="editor";save();render();};root.querySelector("[data-search]").oninput=e=>{S.query=e.target.value;save();render();};root.querySelectorAll("[data-note]").forEach(b=>b.onclick=()=>{S.active=b.dataset.note;S.mobile="editor";save();render();});root.querySelector("[data-back]")?.addEventListener("click",()=>{S.mobile="list";save();render();});root.querySelector("[data-delete]")?.addEventListener("click",()=>{S.deleted.push(x.id);S.active=null;S.mobile="list";save();render();});root.querySelector("[data-title]")?.addEventListener("input",e=>update(x,{title:e.target.value}));root.querySelector("[data-body]")?.addEventListener("input",e=>{update(x,{body:e.target.value});root.querySelector("[data-status]").previousElementSibling.textContent=e.target.value.length+" / "+(x.maxLength||5000);});}render();
-})();
+(function () {
+  "use strict";
 
+  const app = window.VDMApp;
+  const data = app.read("notes", {});
+  const root = document.getElementById("app-body");
+  app.frame(app.brand.name, app.brand.description);
+  const state = app.appState({ active: null, query: "", local: [], deleted: [], mobile: "list" });
+  let debounce = 0;
+
+  function save() { app.saveAppState(state); }
+  function allNotes() { return [...state.local, ...(data.items || [])].filter((item) => !state.deleted.includes(item.id)); }
+
+  function update(item, patch) {
+    if (!state.local.some((note) => note.id === item.id)) state.local.unshift(Object.assign({}, item));
+    const local = state.local.find((note) => note.id === item.id);
+    Object.assign(local, patch, { updatedAt: new Date().toISOString() });
+    window.clearTimeout(debounce);
+    const status = root.querySelector("[data-status]");
+    if (status) status.textContent = "保存中…";
+    debounce = window.setTimeout(() => {
+      save();
+      const nextStatus = root.querySelector("[data-status]");
+      if (nextStatus) nextStatus.textContent = "保存済み";
+    }, 350);
+  }
+
+  function bind(active) {
+    root.querySelector("[data-new]").addEventListener("click", () => {
+      const note = { id: `note-${Date.now()}`, title: "無題", body: "", createdAt: new Date().toISOString(), maxLength: 5000 };
+      state.local.unshift(note);
+      state.active = note.id;
+      state.mobile = "editor";
+      save();
+      render();
+    });
+    root.querySelector("[data-search]").addEventListener("input", (event) => {
+      state.query = event.target.value;
+      save();
+      render();
+      const search = root.querySelector("[data-search]");
+      search?.focus();
+      search?.setSelectionRange(search.value.length, search.value.length);
+    });
+    root.querySelectorAll("[data-note]").forEach((button) => button.addEventListener("click", () => {
+      state.active = button.dataset.note;
+      state.mobile = "editor";
+      save();
+      render();
+    }));
+    root.querySelector("[data-back]")?.addEventListener("click", () => { state.mobile = "list"; save(); render(); });
+    root.querySelector("[data-delete]")?.addEventListener("click", () => {
+      if (!active) return;
+      if (!state.deleted.includes(active.id)) state.deleted.push(active.id);
+      state.active = null;
+      state.mobile = "list";
+      save();
+      render();
+    });
+    root.querySelector("[data-title]")?.addEventListener("input", (event) => update(active, { title: event.target.value }));
+    root.querySelector("[data-body]")?.addEventListener("input", (event) => {
+      update(active, { body: event.target.value });
+      const counter = root.querySelector("[data-count]");
+      if (counter) counter.textContent = `${event.target.value.length} / ${active.maxLength || 5000}`;
+    });
+  }
+
+  function render() {
+    const notes = allNotes();
+    const visible = notes.filter((item) => window.VDMText.includesAll([item.title, item.body].join(" "), state.query));
+    const active = notes.find((item) => item.id === state.active);
+    root.innerHTML = `<section class="notes-layout"><aside class="note-list ${state.mobile === "list" ? "mobile-active" : ""}"><div class="toolbar"><button class="primary" type="button" data-new>新規メモ</button><input class="field" data-search value="${app.esc(state.query)}" placeholder="メモを検索" aria-label="メモを検索"></div>${visible.map((note) => `<button class="note-row" type="button" data-note="${app.esc(note.id)}"><strong>${app.esc(note.title || "無題")}</strong><small>${app.esc(String(note.body || "").slice(0, 48))}</small></button>`).join("")}</aside><main class="note-editor ${state.mobile === "editor" ? "mobile-active" : ""}">${active ? `<div class="toolbar"><button class="ghost mobile-only" type="button" data-back>←</button><button class="ghost" type="button" data-delete>削除</button><span data-count>${String(active.body || "").length} / ${active.maxLength || 5000}</span></div><input class="note-title" data-title value="${app.esc(active.title || "")}" maxlength="100" aria-label="メモの題名"><textarea class="note-text" data-body maxlength="${active.maxLength || 5000}" aria-label="メモ本文">${app.esc(active.body || "")}</textarea><div class="note-status" data-status role="status">保存済み</div>` : '<div class="empty">メモを選択してください</div>'}</main></section>`;
+    bind(active);
+  }
+
+  render();
+})();

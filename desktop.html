@@ -5,19 +5,28 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>この人を知っていますか？</title>
+  <link rel="icon" href="assets/icons/case-favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="desktop.css">
   <link rel="stylesheet" href="desktop-polish.css">
+  <link rel="stylesheet" href="desktop-mobile-wallpaper.css">
 </head>
 <body>
   <main id="desktop" aria-label="仮想デスクトップ">
-    <section class="desktop-icons" id="desktop-icons" aria-label="アプリ"></section>
+    <div class="wallpaper-atmosphere" aria-hidden="true"><span class="wallpaper-reflection"></span><span id="desktop-identity-echo"></span></div>
+    <section class="desktop-icons" id="desktop-icons" aria-label="アプリとファイル"></section>
     <section class="window-layer" id="window-layer" aria-live="polite"></section>
     <aside class="start-menu" id="start-menu" hidden>
       <header><span class="account-dot"></span><div><strong id="start-title">Virtual Desktop</strong><small>ローカル調査環境</small></div></header>
-      <label class="start-search">⌕<input id="start-filter" type="search" placeholder="アプリを検索" aria-label="アプリを検索"></label>
+      <label class="start-search"><span aria-hidden="true">⌕</span><input id="start-filter" type="search" placeholder="アプリを検索" aria-label="アプリを検索"></label>
+      <section class="start-recents" aria-labelledby="recent-title"><h2 id="recent-title">最近使ったアプリ</h2><div id="recent-apps"></div></section>
       <nav id="start-apps" class="start-apps" aria-label="アプリ一覧"></nav>
       <footer><button id="fiction-button" type="button">この作品について</button><button id="reset-button" class="danger" type="button">保存データを初期化</button></footer>
     </aside>
+    <aside class="notification-center" id="notification-center" aria-label="通知センター" hidden>
+      <header><div><strong>通知</strong><small id="notification-summary">新着はありません</small></div><button type="button" id="notification-read-all">すべて既読</button></header>
+      <div id="notification-list" class="notification-list"></div>
+    </aside>
+    <section id="desktop-toasts" class="desktop-toasts" aria-live="polite" aria-atomic="false"></section>
     <dialog id="fiction-dialog">
       <form method="dialog" class="dialog-card">
         <button class="dialog-close" aria-label="閉じる">×</button><span class="dialog-icon">i</span>
@@ -34,9 +43,14 @@
   <footer class="taskbar">
     <button id="start-button" class="start-button" type="button" aria-expanded="false" aria-controls="start-menu" aria-label="スタート"><span class="win-mark"><i></i><i></i><i></i><i></i></span></button>
     <nav id="task-list" aria-label="開いているアプリ"></nav>
-    <button id="case-console-button" class="case-console-task" type="button">復旧管理</button>
-    <div class="system-tray"><span aria-label="オフライン">⌁</span><time id="clock"></time></div>
+    <button id="case-console-button" class="case-console-task" type="button"><span aria-hidden="true">◇</span><span>復旧管理</span></button>
+    <div class="system-tray">
+      <span class="network-state" aria-label="オフライン">オフライン</span>
+      <span class="battery-state" aria-label="バッテリー 78パーセント"><i></i><b>78%</b></span>
+      <button id="notification-button" class="notification-button" type="button" aria-expanded="false" aria-controls="notification-center" aria-label="通知を開く"><span aria-hidden="true">◌</span><b id="notification-badge" hidden>0</b></button>
+      <span class="tray-time"><time id="clock"></time><time id="date"></time></span>
+    </div>
   </footer>
-  <script src="case-manifest.js"></script><script src="crypto-runtime.js"></script><script src="save-adapter.js"></script><script src="core/event-bus.js"></script><script src="core/router.js"></script><script src="data/case-registry.js"></script><script src="case-state.js"></script><script src="desktop.js"></script><script src="desktop-polish.js"></script><script src="case-ui.js"></script>
+  <script src="case-manifest.js"></script><script src="crypto-runtime.js"></script><script src="save-adapter.js"></script><script src="core/event-bus.js"></script><script src="core/router.js"></script><script src="data/case-registry.js"></script><script src="case-state.js"></script><script src="core/ui-icons.js"></script><script src="desktop.js"></script><script src="desktop-polish.js"></script><script src="case-ui.js"></script>
 </body>
 </html>

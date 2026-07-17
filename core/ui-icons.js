@@ -43,7 +43,21 @@
     local: '<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M9 21h6M12 18v3"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
     trend: '<path d="m4 17 5-5 4 3 7-8"/><path d="M15 7h5v5"/>',
-    verified: '<path d="m12 2 2.2 2.1 3-.1.7 2.9 2.5 1.7-1.2 2.8 1.2 2.8-2.5 1.7-.7 2.9-3-.1L12 22l-2.2-2.1-3 .1-.7-2.9-2.5-1.7 1.2-2.8-1.2-2.8 2.5-1.7.7-2.9 3 .1Z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/>'
+    verified: '<path d="m12 2 2.2 2.1 3-.1.7 2.9 2.5 1.7-1.2 2.8 1.2 2.8-2.5 1.7-.7 2.9-3-.1L12 22l-2.2-2.1-3 .1-.7-2.9-2.5-1.7 1.2-2.8-1.2-2.8 2.5-1.7.7-2.9 3 .1Z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/>',
+    "app-search": '<circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="12" r="6.5" stroke-dasharray="2 3"/><path d="M3 7c3.5-4 6-4.5 9-4.5M21 17c-3.5 4-6 4.5-9 4.5"/><path d="m16.8 16.8 4.2 4.2"/>',
+    "app-browser": '<path d="M4 5.5h16v13H4Z"/><path d="M4 9h16M8 5.5V9M12 5.5V9"/><path d="M8 12h3v3H8zM14 12h2.5v4H14z"/>',
+    "app-social": '<path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 5.5v6h6"/><path d="M8 14.5c2.2 1.4 5.8 1.4 8 0M9 9.5h.01M15 9.5h.01"/>',
+    "app-line": '<path d="M4 5h10.5A5.5 5.5 0 0 1 20 10.5v0a5.5 5.5 0 0 1-5.5 5.5H10l-5 4v-4.7A5.5 5.5 0 0 1 4 5Z"/><path d="M8 9h8M8 12.5h5"/>',
+    "app-mail": '<path d="M3.5 7 12 12.5 20.5 7"/><path d="M4 5h16v14H4Z"/><path d="m4 18 5.5-5M20 18l-5.5-5"/><path d="M8 3.5h8"/>',
+    "app-photos": '<path d="M3.5 7h13v13h-13Z"/><path d="M7.5 4h13v13"/><circle cx="8" cy="11" r="1.5"/><path d="m4.5 18 4-4 2.5 2.5 2-2 2.5 2.5"/>',
+    "app-audio": '<path d="M4 14h3l1.5-7L11 18l2.5-12 2 8H20"/><path d="M6 21h12M12 18v3"/><path d="M3 3h18"/>',
+    "app-files": '<path d="M3.5 7h7l2-2h8v14h-17Z"/><path d="M7 11h10M7 14h7M7 17h5"/><path d="M5 4h5l1 1"/>',
+    "app-notes": '<path d="M5 4h14v16H5Z"/><path d="M8 2.5v4M16 2.5v4M8 10h8M8 13.5h6M8 17h4"/><path d="m16 20 3-3"/>',
+    "app-settings": '<path d="M4 5h16M4 12h16M4 19h16"/><circle cx="9" cy="5" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="19" r="2"/>',
+    "app-recovery": '<path d="M12 3 4 7v5c0 5 3.3 8 8 9 4.7-1 8-4 8-9V7Z"/><path d="m8 12 3 3 5-6"/><path d="M12 3v18"/>',
+    "system-trash": '<path d="M5 7h14l-1 14H6Z"/><path d="M3 7h18M9 3h6l1 4M9 11v6M15 11v6"/>',
+    "system-purchase": '<path d="M5 3.5h14v17H5Z"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="M3 6h4M17 18h4"/>',
+    "system-temp": '<path d="M3.5 7h7l2-2h8v14h-17Z"/><path d="m9 11 6 6M15 11l-6 6"/>'
   };
 
   function icon(name, className) {
@@ -51,5 +65,15 @@
     return '<svg class="ui-icon' + (className ? ' ' + className : '') + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + body + '</svg>';
   }
 
-  global.VDMIcons = { icon, names: Object.freeze(Object.keys(paths)) };
+  const appIcons = Object.freeze({
+    search: "app-search", browser: "app-browser", social: "app-social", line: "app-line",
+    mail: "app-mail", photos: "app-photos", audio: "app-audio", files: "app-files",
+    notes: "app-notes", settings: "app-settings", recovery: "app-recovery"
+  });
+
+  function appIcon(id, className) {
+    return icon(appIcons[id] || "info", className);
+  }
+
+  global.VDMIcons = { icon, appIcon, appIcons, names: Object.freeze(Object.keys(paths)) };
 })(window);

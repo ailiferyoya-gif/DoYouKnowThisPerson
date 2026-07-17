@@ -30,6 +30,21 @@
     });
   }
 
+  function applyWorldState(state) {
+    const current = state || {};
+    const world = Number(current.worldVersion || 0);
+    const band = current.ending ? "ending" : world >= 7 ? "late" : world >= 3 ? "mid" : "early";
+    document.documentElement.dataset.worldBand = band;
+    const desktop = document.getElementById("desktop");
+    if (desktop) desktop.dataset.worldBand = band;
+    if (current.ending) {
+      document.body.dataset.ending = current.ending;
+      document.documentElement.dataset.ending = current.ending;
+    }
+    const echo = document.getElementById("desktop-identity-echo");
+    if (echo) echo.textContent = (band === "late" || band === "ending") ? String(current.player?.displayName || "") : "";
+  }
+
   const observer = new MutationObserver((records) => {
     records.forEach((record) => record.addedNodes.forEach((node) => {
       if (!(node instanceof Element)) return;
@@ -44,9 +59,10 @@
   global.addEventListener("case-state-change", (event) => {
     const state = event.detail || {};
     applySettings(settingsFromState(state));
-    if (state.ending) document.body.dataset.ending = state.ending;
+    applyWorldState(state);
   });
 
   const state = global.CASE_STATE && global.CASE_STATE.get ? global.CASE_STATE.get() : {};
   applySettings(settingsFromState(state));
+  applyWorldState(state);
 })(window);

@@ -31,18 +31,26 @@ body,
 .browser-page,
 .conversation-scroll,
 .message-list,
+.call-list,
+.contact-list,
+.saved-list,
 .ripple-center,
 .ripple-left,
 .ripple-right,
 .mail-list,
 .mail-body,
 .photo-stage,
+.photo-info,
 .audio-layout .content,
 .audio-layout .list,
+.tree,
 .file-table,
 .detail-pane,
 .note-list,
+.note-text,
 .settings-page {
+  min-height: 0;
+  overflow-y: auto;
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
 }

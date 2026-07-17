@@ -1,0 +1,5 @@
+@media (max-width: 720px) {
+  :root {
+    --case-wallpaper: url("assets/wallpaper/kirikawa-riverside-w0-tall.png");
+  }
+}

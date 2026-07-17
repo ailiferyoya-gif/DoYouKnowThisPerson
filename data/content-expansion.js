@@ -181,7 +181,7 @@
       ["ニュース", "/news"], ["品質・セキュリティ", "/quality"], ["採用", "/careers"]
     ]);
     mergePages("tohama-its", {
-      "/": corporatePage("止められない業務の、移行手順をつくる。", "TOHAMA INFORMATION SOLUTIONS", "自治体と地域機関のシステム更新を、窓口の運用から設計する会社です。", [
+      "/": corporatePage("公共システムの切替・運用支援", "TOHAMA INFORMATION SOLUTIONS", "自治体と地域機関のシステム更新について、現行調査から切替後の受付までを受託しています。", [
         card("移行設計", "現行調査、切替日、差戻し条件を一冊の手順へまとめます。"),
         card("運用支援", "担当者交代後も迷わない更新記録と研修を提供します。"),
         card("公開情報管理", "索引、PDF、更新履歴の整合を日次で確認します。")
@@ -250,6 +250,7 @@
 
   // 支援室: 制度だけでなく、利用条件、同意、記録保持を通常ページで説明する。
   if (sites["kirikawa-support"]) {
+    sites["kirikawa-support"].pages["/"].title = "相談内容と利用方法";
     sites["kirikawa-support"].navigation = nav("kirikawa-support", [
       ["相談の流れ", "/flow"], ["支援制度", "/programs"], ["同意と記録", "/consent"],
       ["活動報告", "/reports"], ["相談員", "/staff"], ["FAQ", "/faq"]
@@ -413,7 +414,7 @@
       profile: [{ label: "管理戸数", value: "428戸" }, { label: "営業時間", value: "9:30〜18:00 / 水曜休" }, { label: "所在地", value: "霧川駅西口 徒歩4分" }]
     }, extra || {}));
     mergePages("crescent-home", {
-      "/": realty("霧川で、入居後まで相談できる部屋探し。", "駅西・朝霧台・東浜を中心に、管理物件と入居手続きを案内します。", [
+      "/": realty("霧川市内の賃貸物件・管理窓口", "駅西・朝霧台・東浜を中心に、空室情報と入居中の連絡先を掲載しています。", [
         { title: "空室を探す", summary: "間取り、賃料、入居時期から絞り込めます。" },
         { title: "入居中の連絡", summary: "水漏れ、鍵、共用部の不具合を受け付けます。" },
         { title: "退去", summary: "契約書の予告期間を確認して手続きしてください。" }
@@ -553,7 +554,7 @@
       profile: [{ label: "所在地", value: "霧川市駅西三丁目" }, { label: "営業時間", value: "10:00〜19:00" }, { label: "定休日", value: "火曜・第2水曜" }]
     }, extra || {}));
     mergePages("studio-lumen", {
-      "/": studio("写真を撮る日を、急がせない。", "STUDIO LUMEN / KIRIKAWA", "家族、仕事、学校行事。用途に合わせて撮影時間と納品範囲を先に決めます。", [
+      "/": studio("撮影メニューと予約案内", "STUDIO LUMEN / KIRIKAWA", "家族写真、仕事用プロフィール、学校行事について、撮影時間と納品範囲を案内します。", [
         { title: "人物撮影", summary: "一組ずつ。背景紙と窓側の自然光から選べます。" },
         { title: "イベント", summary: "学校、式典、小規模ライブ。事前に撮影不可範囲を確認します。" },
         { title: "証明写真", summary: "当日データとプリント。修整範囲は撮影後に確認します。" }
@@ -629,6 +630,102 @@
       "/404": { title: "ページが見つかりません", status: 404, notice: "公開期間を終えた作例は、プライバシー方針に基づき表示しません。" }
     });
   }
+
+  // 初期ファクトリー由来の共通欄を、各サイトで本来掲載するページだけへ限定する。
+  // Evidenceを含む項目は削らず、事件の観測経路と版管理はそのまま維持する。
+  const pageVariants = (raw) => !raw?.title && Array.isArray(raw?.versions) ? raw.versions : [raw];
+  const containsEvidence = (value) => {
+    if (!value || typeof value !== "object") return false;
+    if (typeof value.evidenceId === "string") return true;
+    return (Array.isArray(value) ? value : Object.values(value)).some(containsEvidence);
+  };
+  const keepEvidenceOnly = (items) => Array.isArray(items) ? items.filter(containsEvidence) : items;
+  const forRoute = (host, routePath, callback) => {
+    const raw = sites[host]?.pages?.[routePath];
+    if (raw) pageVariants(raw).forEach(callback);
+  };
+  const filterByTitle = (host, keys, rejectedTitles) => {
+    Object.values(sites[host]?.pages || {}).forEach((raw) => pageVariants(raw).forEach((page) => {
+      keys.forEach((key) => {
+        if (!Array.isArray(page[key])) return;
+        page[key] = page[key].filter((item) => containsEvidence(item) || !rejectedTitles.includes(item?.title));
+      });
+    }));
+  };
+
+  filterByTitle("kirikawa-city", ["notices"], ["熱中症予防のための公共施設開放", "河川清掃に伴う通行案内"]);
+  filterByTitle("kirikawa-city", ["updates"], ["表記を更新", "掲載内容を確認"]);
+
+  const tohamaKeep = {
+    "/": ["services", "news", "profile"],
+    "/services": ["services"],
+    "/public": ["services"],
+    "/cases": ["caseStudies"],
+    "/news": ["news"],
+    "/company": ["profile"],
+    "/faq": ["faq", "caseStudies"]
+  };
+  ["/", "/services", "/public", "/cases", "/news", "/careers", "/quality", "/faq", "/company"].forEach((routePath) => {
+    forRoute("tohama-its", routePath, (page) => {
+      ["services", "news", "profile", "faq", "caseStudies"].forEach((key) => {
+        if (!(tohamaKeep[routePath] || []).includes(key)) page[key] = keepEvidenceOnly(page[key]);
+      });
+    });
+  });
+  forRoute("tohama-its", "/careers", (page) => { page.sections = [section("募集職種", "2026年4月入社の運用設計、ヘルプデスク、法人営業を募集しています。", ["書類受付 7月31日まで", "一次面接は霧川本社またはオンライン", "公共分野の経験は不問"]), section("選考に関する連絡", "応募書類の受領後、五営業日以内に採用担当から連絡します。", [])]; });
+  forRoute("tohama-its", "/quality", (page) => { page.sections = [section("変更管理", "本番反映は申請、相互確認、反映後点検の三段階で記録します。", ["緊急変更は翌営業日に再確認", "権限棚卸しは四半期ごと", "委託先の操作記録は一年保存"]), section("障害の受付", "契約番号と発生時刻を確認し、公開影響のある事象を優先して切り分けます。", [])]; });
+
+  filterByTitle("kirikawa-news", ["related"], ["市民講座、写真整理を学ぶ", "駅北口の歩道工事が完了"]);
+  filterByTitle("kirikawa-news", ["popular"], ["朝霧川の桜、今週末が見頃", "商店街の夜市は27日"]);
+  const newsBodies = {
+    "/government": ["市の広報デジタル資料室では、紙の広報と公開済み写真を年度別に点検している。取材日は2月12日。担当表と当日の作業写真を編集部で確認した。", "記事本文を6月19日に改稿した。変更箇所と理由は訂正欄に記録している。"],
+    "/local": ["夜市は駅西通りの車道を使い、午後4時から9時まで開く。出店者一覧は商店会が20日に更新した。", "雨天時はアーケード内の飲食店のみ営業する。開催可否は当日正午に追記する。"],
+    "/life": ["祝日の家庭ごみは通常の曜日どおり収集する。東地区の資源回収だけは翌週へ振り替える。", "収集時刻は道路状況で前後するため、午前8時までに集積所へ出すよう市環境課が呼びかけている。"],
+    "/authors/kawai": ["河合美緒は行政、福祉、地域交通を担当。会議資料と現地取材を照合し、公開後の訂正履歴を記事末尾に残す。", "情報提供は編集部窓口で受け付ける。匿名情報は、別の資料または取材先で確認できた場合に限り記事へ用いる。"],
+    "/corrections": ["記事番号を維持したまま本文を変更した場合、変更日時と対象箇所を掲載する。表記の調整だけの場合も履歴から確認できる。"],
+    "/popular": ["閲覧数は直近七日間の集計。速報の自動更新を除き、同じ端末からの連続閲覧は一回として数える。"],
+    "/tips": ["写真は撮影日時と場所、文書は作成元が分かる状態で送ってください。個人の住所や電話番号は本文へ書かないでください。"]
+  };
+  Object.entries(newsBodies).forEach(([routePath, body]) => forRoute("kirikawa-news", routePath, (page) => { page.body = body; }));
+
+  const supportKeep = {
+    "/": ["flow", "audience", "faq", "training", "staff", "privacy", "emergency"],
+    "/flow": ["flow"],
+    "/eligible": ["audience"],
+    "/programs": ["reports"],
+    "/staff": ["staff"],
+    "/faq": ["faq"],
+    "/privacy": ["privacy"],
+    "/training": ["reports", "training"],
+    "/emergency": ["emergency"]
+  };
+  ["/", "/flow", "/eligible", "/programs", "/reports", "/staff", "/faq", "/privacy", "/training", "/donate", "/emergency"].forEach((routePath) => {
+    forRoute("kirikawa-support", routePath, (page) => {
+      ["flow", "audience", "faq", "reports", "training", "staff"].forEach((key) => {
+        if (!(supportKeep[routePath] || []).includes(key)) page[key] = keepEvidenceOnly(page[key]);
+      });
+      if (!(supportKeep[routePath] || []).includes("privacy")) page.privacy = "";
+      if (!(supportKeep[routePath] || []).includes("emergency")) page.emergency = "";
+    });
+  });
+  forRoute("kirikawa-support", "/reports", (page) => { page.sections = [section("2024年度の内訳", "個人を特定できない形で受付方法と支援区分を集計しています。", ["相談 延べ318件", "来室96件・電話142件・オンライン80件", "緊急宿泊 実人数17人"]), section("公開日", "2025年5月16日。数値の修正がある場合は同じページへ履歴を残します。", [])]; });
+  forRoute("kirikawa-support", "/donate", (page) => { page.sections = [section("2024年度の使途", "寄付金は緊急宿泊費、移動費、生活用品の購入へ充てました。相談員の人件費には使用していません。", ["緊急宿泊 42%", "移動・通信 31%", "生活用品 27%"]), section("受領方法", "窓口または銀行振込。匿名での寄付も受け付けます。", [])]; });
+  forRoute("kirikawa-support", "/emergency", (page) => { page.sections = [section("このページを閉じる前に", "安全な端末へ移れる場合は履歴を残さず、地域の公的な緊急窓口へ連絡してください。", ["端末を共有している場合は通知表示に注意", "位置情報や写真の送信は本人が選ぶ", "支援室は警察・消防の代わりにはなりません"] )]; });
+
+  filterByTitle("hokushin-wu", ["versions"], ["目録更新"]);
+  filterByTitle("hokushin-wu", ["related"], ["学園祭パンフレット"]);
+  filterByTitle("kirikawa-med", ["notices"], ["熱中症予防のための公共施設開放", "河川清掃に伴う通行案内"]);
+  filterByTitle("kirikawa-med", ["updates"], ["表記を更新", "掲載内容を確認"]);
+
+  Object.entries(sites["crescent-home"]?.pages || {}).forEach(([routePath, raw]) => {
+    if (routePath !== "/") pageVariants(raw).forEach((page) => { page.profile = []; });
+  });
+  Object.entries(sites["studio-lumen"]?.pages || {}).forEach(([routePath, raw]) => {
+    if (routePath !== "/") pageVariants(raw).forEach((page) => { page.profile = []; });
+  });
+  Object.entries(sites["kirikawa-bbs"]?.pages || {}).forEach(([routePath, raw]) => {
+    if (!["/", "/rules"].includes(routePath)) pageVariants(raw).forEach((page) => { page.rules = ""; });
+  });
 
   // 通常検索結果を増やす。事件語を含めず、サイトが日常に使われている手触りを補う。
   if (data.search && Array.isArray(data.search.records)) {

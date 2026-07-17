@@ -588,9 +588,8 @@ textarea {
 }
 
 .notification-remnant {
-  display: flex;
+  display: grid;
   max-width: 420px;
-  align-items: center;
   gap: 10px;
   margin: 12px auto;
   padding: 10px 12px;
@@ -600,9 +599,19 @@ textarea {
   color: #65757a;
 }
 
-.notification-remnant > span {
+.notification-remnant-copy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-remnant-copy > span {
   display: grid;
   gap: 2px;
+}
+
+.notification-remnant .message-attachments {
+  margin-top: 2px;
 }
 
 .notification-remnant small {
