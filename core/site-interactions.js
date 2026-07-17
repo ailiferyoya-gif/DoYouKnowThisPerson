@@ -123,31 +123,67 @@
   function bindBoard(root, context) {
     const form = root.querySelector(".board-compose");
     const thread = root.querySelector(".thread-list");
+    const appState = context.appState || (context.appState = {});
+    const localState = appState.siteLocal || (appState.siteLocal = {});
+    const boardPath = root.dataset.boardPath || "/";
+    const savedPosts = Array.isArray(localState.boardPosts) ? localState.boardPosts : (localState.boardPosts = []);
+    const savedReports = Array.isArray(localState.boardReports) ? localState.boardReports : (localState.boardReports = []);
+    const save = () => {
+      if (typeof context.save === "function") context.save();
+      if (global.VDMApp && typeof global.VDMApp.saveAppState === "function") global.VDMApp.saveAppState({ siteLocal: localState });
+    };
+    const reportKey = (number) => boardPath + ":" + String(number);
     const wireReport = (button) => {
+      if (!button) return;
+      const key = reportKey(button.dataset.report);
+      if (savedReports.includes(key)) {
+        button.textContent = "報告済み";
+        button.disabled = true;
+        return;
+      }
       button.addEventListener("click", () => {
         button.textContent = "報告済み";
         button.disabled = true;
+        if (!savedReports.includes(key)) savedReports.push(key);
+        save();
         status(root, "この端末内で報告済みにしました");
       }, { once: true });
     };
+
+    const appendLocalPost = (post) => {
+      if (!thread) return null;
+      const number = Number(post.number);
+      if (!Number.isFinite(number) || thread.querySelector("#post-" + number)) return null;
+      const item = document.createElement("li");
+      item.id = "post-" + number;
+      item.dataset.localPost = "true";
+      item.dataset.siteFilterItem = "";
+      item.dataset.filterText = String(post.name || "匿名") + " " + String(post.text || "");
+      item.innerHTML = '<header><span class="post-number">#' + number + '</span><strong></strong><small></small></header><p></p><button type="button" data-report="' + number + '">報告</button>';
+      item.querySelector("strong").textContent = post.name || "匿名";
+      item.querySelector("small").textContent = "ID:local　" + (post.date || "端末内保存");
+      item.querySelector("p").textContent = post.text || "";
+      thread.appendChild(item);
+      wireReport(item.querySelector("[data-report]"));
+      return item;
+    };
+
     root.querySelectorAll("[data-report]").forEach(wireReport);
+    if (form && boardPath === "/write") {
+      savedPosts.filter((post) => (post.path || "/write") === boardPath).forEach(appendLocalPost);
+    }
     root.querySelector("[data-board-submit]")?.addEventListener("click", () => {
       if (!form || !thread) return;
       const name = form.querySelector("[name=name]").value.trim() || "匿名";
       const text = form.querySelector("[name=text]").value.trim();
       if (!text) { status(root, "本文を入力してください"); return; }
-      const number = thread.children.length + 1;
-      const item = document.createElement("li");
-      item.id = "post-" + number;
-      item.innerHTML = '<header><span class="post-number">#' + number + '</span><strong></strong><small>ID:local ' + new Date().toLocaleString("ja-JP") + '</small></header><p></p><button type="button" data-report="' + number + '">報告</button>';
-      item.querySelector("strong").textContent = name;
-      item.querySelector("p").textContent = text;
-      thread.appendChild(item);
-      context.appState.siteLocal = context.appState.siteLocal || {};
-      (context.appState.siteLocal.boardPosts || (context.appState.siteLocal.boardPosts = [])).push({ number, name, text });
-      context.save();
+      const existingNumbers = [...thread.querySelectorAll(".post-number")].map((node) => Number(node.textContent.replace("#", ""))).filter(Number.isFinite);
+      const number = Math.max(0, ...existingNumbers) + 1;
+      const post = { number, name, text, date: new Date().toLocaleString("ja-JP"), path: boardPath };
+      savedPosts.push(post);
+      appendLocalPost(post);
+      save();
       form.reset();
-      wireReport(item.querySelector("[data-report]"));
       status(root, "端末内に投稿しました");
     });
   }
@@ -179,12 +215,13 @@
   }
 
   function bind(root, context) {
+    const siteRoot = root.matches(".case-site") ? root : root.querySelector(".case-site");
     bindMenu(root);
     bindDirectory(root);
     bindLocalFilter(root);
-    if (root.matches(".university-site")) bindCatalog(root);
-    if (root.matches(".bbs-site")) bindBoard(root, context || { appState: {}, save() {} });
-    if (root.matches(".cache-blog-site")) bindBlog(root);
+    if (siteRoot?.matches(".university-site")) bindCatalog(siteRoot);
+    if (siteRoot?.matches(".bbs-site")) bindBoard(siteRoot, context || { appState: {}, save() {} });
+    if (siteRoot?.matches(".cache-blog-site")) bindBlog(siteRoot);
   }
 
   global.VDMSiteInteractions = { bind };

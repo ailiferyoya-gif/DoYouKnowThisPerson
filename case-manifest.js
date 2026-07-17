@@ -20,7 +20,8 @@ window.CASE_MANIFEST = {
                        "search":  {
                                       "id":  "search",
                                       "label":  "Mira Search",
-                                      "icon":  "S",
+                                      "icon":  "app-search",
+                                      "iconAsset":  "core/ui-icons.js#app-search",
                                       "entry":  "apps/search/index.html",
                                       "dependencies":  [
                                                            "browser"
@@ -37,7 +38,8 @@ window.CASE_MANIFEST = {
                        "browser":  {
                                        "id":  "browser",
                                        "label":  "Lattice",
-                                       "icon":  "B",
+                                       "icon":  "app-browser",
+                                       "iconAsset":  "core/ui-icons.js#app-browser",
                                        "entry":  "apps/browser/index.html",
                                        "dependencies":  [
                                                             "search"
@@ -54,7 +56,8 @@ window.CASE_MANIFEST = {
                        "social":  {
                                       "id":  "social",
                                       "label":  "Ripple",
-                                      "icon":  "O",
+                                      "icon":  "app-social",
+                                      "iconAsset":  "core/ui-icons.js#app-social",
                                       "entry":  "apps/social/index.html",
                                       "window":  {
                                                      "width":  1190,
@@ -76,7 +79,8 @@ window.CASE_MANIFEST = {
                        "line":  {
                                     "id":  "line",
                                     "label":  "Link",
-                                    "icon":  "L",
+                                    "icon":  "app-line",
+                                    "iconAsset":  "core/ui-icons.js#app-line",
                                     "entry":  "apps/line/index.html",
                                     "window":  {
                                                    "width":  1040,
@@ -98,7 +102,8 @@ window.CASE_MANIFEST = {
                        "mail":  {
                                     "id":  "mail",
                                     "label":  "Postbox",
-                                    "icon":  "M",
+                                    "icon":  "app-mail",
+                                    "iconAsset":  "core/ui-icons.js#app-mail",
                                     "entry":  "apps/mail/index.html",
                                     "dependencies":  [
 
@@ -115,7 +120,8 @@ window.CASE_MANIFEST = {
                        "photos":  {
                                       "id":  "photos",
                                       "label":  "Photos",
-                                      "icon":  "P",
+                                      "icon":  "app-photos",
+                                      "iconAsset":  "core/ui-icons.js#app-photos",
                                       "entry":  "apps/photos/index.html",
                                       "dependencies":  [
 
@@ -132,7 +138,8 @@ window.CASE_MANIFEST = {
                        "audio":  {
                                      "id":  "audio",
                                      "label":  "Audio",
-                                     "icon":  "A",
+                                     "icon":  "app-audio",
+                                     "iconAsset":  "core/ui-icons.js#app-audio",
                                      "entry":  "apps/audio/index.html",
                                      "dependencies":  [
 
@@ -149,7 +156,8 @@ window.CASE_MANIFEST = {
                        "files":  {
                                      "id":  "files",
                                      "label":  "Files",
-                                     "icon":  "F",
+                                     "icon":  "app-files",
+                                     "iconAsset":  "core/ui-icons.js#app-files",
                                      "entry":  "apps/files/index.html",
                                      "dependencies":  [
 
@@ -166,7 +174,8 @@ window.CASE_MANIFEST = {
                        "notes":  {
                                      "id":  "notes",
                                      "label":  "Notes",
-                                     "icon":  "N",
+                                     "icon":  "app-notes",
+                                     "iconAsset":  "core/ui-icons.js#app-notes",
                                      "entry":  "apps/notes/index.html",
                                      "dependencies":  [
 
@@ -183,7 +192,8 @@ window.CASE_MANIFEST = {
                        "settings":  {
                                         "id":  "settings",
                                         "label":  "Settings",
-                                        "icon":  "C",
+                                        "icon":  "app-settings",
+                                        "iconAsset":  "core/ui-icons.js#app-settings",
                                         "entry":  "apps/settings/index.html",
                                         "dependencies":  [
 

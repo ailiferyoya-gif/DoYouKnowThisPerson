@@ -3,7 +3,7 @@
 const A=window.VDMApp,D=A.read("search",{}),T=window.VDMText,root=document.getElementById("app-body");
 A.frame(A.brand.name,A.brand.description);document.querySelector(".app-mark").textContent=A.brand.icon||"";
 const seedRecords=(D.records||[]).filter(x=>!x.availableWhen&&String(x.keywords||"").includes("藤崎千尋"));
-const seed={id:"initial-history",query:"藤崎千尋",kind:"all",at:new Date("2025-06-21T02:11:00+09:00").getTime(),reason:"recovery",resultIds:seedRecords.map(x=>x.id),snapshot:seedRecords,worldVersion:0,pageVersion:0,suggestion:""};
+const seed={id:"initial-history",query:"藤崎千尋",kind:"all",at:Date.now(),reason:"recovery",resultIds:seedRecords.map(x=>x.id),snapshot:seedRecords,worldVersion:0,pageVersion:0,suggestion:""};
 const local=A.appState({view:"history",query:"",kind:"all",history:[{sessionId:seed.id,query:seed.query,kind:"all",at:seed.at,worldVersion:0,pageVersion:0}],sessions:[seed],sessionId:null,sequence:0});
 const available=(item)=>{const has=id=>Boolean(A.state&&A.state.hasEvidence&&A.state.hasEvidence(id)),required=Array.isArray(item.availableWhen)?item.availableWhen:item.availableWhen?[item.availableWhen]:[],removed=Array.isArray(item.removedWhen)?item.removedWhen:item.removedWhen?[item.removedWhen]:[],protectedUnseen=Boolean(item.protectUntilSeen&&!has(item.protectUntilSeen));if(required.length&&protectedUnseen)return false;if(!required.every(has))return false;if(removed.some(has)&&!protectedUnseen)return false;return true;};
 const versions=(item)=>{const list=item.versions||[item];return list.filter(available).at(-1)||item;};

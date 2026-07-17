@@ -1,7 +1,8 @@
 {
   "id": "settings",
   "label": "Settings",
-  "icon": "C",
+  "icon": "app-settings",
+  "iconAsset": "core/ui-icons.js#app-settings",
   "entry": "apps/settings/index.html",
   "dependencies": [],
   "capabilities": [
@@ -13,4 +14,3 @@
     "single-html"
   ]
 }
-

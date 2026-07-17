@@ -1,7 +1,8 @@
 {
   "id": "mail",
   "label": "Postbox",
-  "icon": "M",
+  "icon": "app-mail",
+  "iconAsset": "core/ui-icons.js#app-mail",
   "entry": "apps/mail/index.html",
   "dependencies": [],
   "capabilities": [
@@ -13,4 +14,3 @@
     "single-html"
   ]
 }
-

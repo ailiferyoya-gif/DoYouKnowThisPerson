@@ -1,7 +1,8 @@
 {
   "id": "files",
   "label": "Files",
-  "icon": "F",
+  "icon": "app-files",
+  "iconAsset": "core/ui-icons.js#app-files",
   "entry": "apps/files/index.html",
   "dependencies": [],
   "capabilities": [
@@ -13,4 +14,3 @@
     "single-html"
   ]
 }
-

@@ -1,7 +1,8 @@
 {
   "id": "line",
   "label": "Link",
-  "icon": "L",
+  "icon": "app-line",
+  "iconAsset": "core/ui-icons.js#app-line",
   "entry": "apps/line/index.html",
   "window": { "width": 1040, "height": 710, "minWidth": 760 },
   "dependencies": [],

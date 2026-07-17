@@ -1,7 +1,8 @@
 {
   "id": "social",
   "label": "Ripple",
-  "icon": "O",
+  "icon": "app-social",
+  "iconAsset": "core/ui-icons.js#app-social",
   "entry": "apps/social/index.html",
   "window": { "width": 1190, "height": 740, "minWidth": 780 },
   "dependencies": [],

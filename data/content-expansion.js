@@ -468,6 +468,16 @@
         { title: "来店", summary: "9:30〜18:00、水曜休。" },
         { title: "内見", summary: "現地待合せも可能。身分証の写しは契約時まで不要です。" }
       ], photo("P12", "書類と鍵札が並ぶ受付机。", "来店時の受付イメージ。", "作品内資料")),
+      "/archive": realty("過去掲載", "募集を終了した物件のうち、契約や安全上の理由で残せる範囲だけを掲載しています。室番号や室内写真を非公開にする場合があります。", [], photo("P10", "募集終了後の朝霧台コーポ外観。建物名と共用部だけが確認できる。", "過去掲載の外観記録。", "クレセントホーム霧川"), {
+        caseStudies: [{
+          title: "保護転居に伴う掲載停止",
+          summary: "掲載写真P10と室内情報を停止。本人申請は住所・勤務先・経路に限定。",
+          detail: "削除申請の備考に『知人への応答は対象外』とある。",
+          evidenceId: "E11",
+          medium: "property"
+        }],
+        sections: [section("掲載終了後の扱い", "成約済み物件は賃料改定の参考資料として六か月保管します。入居者の安全に関わる申出がある場合は、外観、室番号、間取りを個別に非公開へ切り替えます。", ["募集条件は掲載当時のもの", "現入居者への取次ぎは行いません"])]
+      }),
       "/404": { title: "掲載を終了しました", status: 404, notice: "成約、募集条件の変更、入居者の安全上の理由で公開を終了する場合があります。" }
     });
   }
@@ -604,13 +614,13 @@
         { title: "イベント", summary: "主催者との契約範囲で納品。個人からの問い合わせは主催者へ案内します。" }
       ], photo("P24", "納品用媒体と同意書を別々にまとめた机上。", "納品物と書類は分けて管理する。", "Studio Lumen")),
       "/portfolio": studio("作例", "SELECTED WORK", "掲載許可を受けた写真と、公開用に用意した地域記録です。", [
-        { title: "人物", summary: "自然光、背景紙、仕事用プロフィール。" },
-        { title: "地域", summary: "河川清掃、商店街、文化会館。" },
-        { title: "仕事", summary: "受付、作業風景、店舗外観。" }
+        { title: "人物", summary: "自然光、背景紙、仕事用プロフィール。", heroMedia: photo("P17", "背景紙の前で人物撮影を行う東雲遥。", "人物撮影 / 窓側セット。", "Studio Lumen") },
+        { title: "地域", summary: "河川清掃、商店街、文化会館。", heroMedia: photo("P18", "朝霧川の清掃に参加する住民。", "地域記録 / 朝霧川。", "Studio Lumen") },
+        { title: "仕事", summary: "受付、作業風景、店舗外観。", heroMedia: photo("P23", "モニターと紙の確認表が並ぶ作業机。", "業務記録 / 確認作業。", "Studio Lumen") }
       ], photo("P17", "スタジオで人物撮影を行うカメラマン。", "人物撮影の作例制作風景。", "Studio Lumen"), {
         caseStudies: [
-          { title: "朝霧川清掃", summary: "主催者記録。参加者の名札は公開版に含めない。" },
-          { title: "駅西商店街", summary: "閉店前の店舗外観と看板を記録。" }
+          { title: "朝霧川清掃", summary: "主催者記録。参加者の名札は公開版に含めない。", heroMedia: photo("P18", "朝霧川沿いでごみ袋を持つ清掃参加者。", "2025年5月18日 / 主催者記録。", "Studio Lumen") },
+          { title: "駅西商店街", summary: "閉店前の店舗外観と看板を記録。", heroMedia: photo("P19", "駅西商店街の通りに残る古い靴店看板。", "2025年1月28日 / 店舗外観記録。", "Studio Lumen") }
         ]
       }),
       "/access": studio("アクセス", "VISIT", "霧川駅西口から徒歩7分。商店街の旧靴店を曲がり、白い引戸の建物2階です。", [
@@ -652,6 +662,152 @@
       });
     }));
   };
+
+  // 初期データで共有されていた所管・日付・見出しを、各ページを実際に更新する部署へ戻す。
+  const cityMetadata = {
+    "/": ["市長公室 広報広聴課", "2025年6月20日"],
+    "/digital-archive": ["市長公室 広報広聴課 デジタル資料室", "2025年6月18日"],
+    "/staff": ["総務部 人事課", "2025年4月1日"],
+    "/life-protection": ["福祉部 生活支援課", "2024年8月30日"],
+    "/council": ["議会事務局 議事課", "2025年6月12日"],
+    "/privacy": ["総務部 総務課", "2025年5月1日"],
+    "/lectures": ["市民文化部 地域連携課", "2025年5月22日"],
+    "/records": ["市長公室 広報広聴課", "2025年6月19日"],
+    "/services": ["市民生活部 市民課", "2025年4月7日"],
+    "/updates": ["市長公室 広報広聴課", "2025年6月20日"],
+    "/search": ["企画政策部 デジタル推進課", "2025年6月16日"]
+  };
+  Object.entries(cityMetadata).forEach(([routePath, values]) => forRoute("kirikawa-city", routePath, (page) => {
+    page.department = values[0];
+    page.publishedAt = values[1];
+  }));
+
+  const tohamaEyebrows = {
+    "/services": "SERVICE DESK / DELIVERY",
+    "/public": "PUBLIC SECTOR / OPERATIONS",
+    "/cases": "CASE FILE / KIRIKAWA",
+    "/news": "CORPORATE NOTICE",
+    "/careers": "RECRUIT / 2026",
+    "/quality": "QUALITY & SECURITY",
+    "/faq": "SUPPORT / FAQ",
+    "/company": "COMPANY PROFILE"
+  };
+  Object.entries(tohamaEyebrows).forEach(([routePath, eyebrow]) => forRoute("tohama-its", routePath, (page) => { page.eyebrow = eyebrow; }));
+
+  const newsMetadata = {
+    "/local": ["地域", "永瀬拓", "2025年6月20日 18:10"],
+    "/life": ["暮らし", "生活情報デスク", "2025年6月19日 07:30"],
+    "/authors/kawai": ["記者", "編集部", "2025年4月1日 10:00"],
+    "/corrections": ["訂正・更新", "編集部", "2025年6月19日 16:42"],
+    "/popular": ["集計", "編集部データ担当", "2025年6月21日 06:00"],
+    "/tips": ["情報提供", "編集部受付", "2025年5月1日 09:00"]
+  };
+  Object.entries(newsMetadata).forEach(([routePath, values]) => forRoute("kirikawa-news", routePath, (page) => {
+    page.category = values[0];
+    page.author = values[1];
+    page.publishedAt = values[2];
+  }));
+  forRoute("kirikawa-news", "/corrections", (page) => {
+    page.correction = "6月19日、記事番号KN-2025-0216の氏名と引用を削除しました。初出時刻とURLは変更していません。";
+  });
+  forRoute("kirikawa-news", "/government", (page) => {
+    page.heroMedia = photo("P16", "霧川市役所の資料室で、記者が職員へ取材している。", "2月12日、市役所資料室での取材。", "撮影・霧川ローカルニュース編集部");
+    page.photoAlt = page.heroMedia.alt;
+  });
+
+  // 制度説明、年次報告、予約窓口では、同じ注意書きを機械的に繰り返さない。
+  forRoute("kirikawa-support", "/consent", (page) => {
+    page.emergency = "";
+    page.privacy = "記録する項目と共有先は別々に確認します。相談中でも共有停止や記載訂正を申し出られます。";
+  });
+  forRoute("kirikawa-support", "/annual-report", (page) => {
+    page.emergency = "";
+    page.privacy = "";
+  });
+  forRoute("kirikawa-support", "/contact", (page) => {
+    page.emergency = "差し迫った危険がある場合は、予約を待たず警察・消防など地域の緊急窓口を利用してください。";
+    page.privacy = "予約時に確認するのは、折返し方法と希望時間です。相談内容を先に書く必要はありません。";
+  });
+
+  // PC-2016-081は一覧と詳細で同じ版を表示する。P05の画像説明に残る人数差も意図した観察点として維持する。
+  const photoClubPage = sites["hokushin-wu"]?.pages?.["/photo-club"];
+  if (photoClubPage && Array.isArray(photoClubPage.versions)) {
+    const mediaForVersion = (version) => version === 2
+      ? photo("P05", "大学祭の展示室前に6人が並ぶ写真部集合写真。", "公開用現行版。画像説明は初版の人数のまま。", "北辰女子大学 写真部")
+      : photo("P04", "大学祭の展示室前に6人が並ぶ写真部集合写真。", "公開用初版。", "北辰女子大学 写真部");
+    photoClubPage.versions.forEach((page) => {
+      page.heroMedia = mediaForVersion(page.version);
+      page.photoAlt = page.heroMedia.alt;
+    });
+    const previousDetail = sites["hokushin-wu"].pages["/records/PC-2016-081"] || {};
+    sites["hokushin-wu"].pages["/records/PC-2016-081"] = {
+      versions: photoClubPage.versions.map((source) => {
+        const sourceRecord = source.records?.[0] || {};
+        const media = mediaForVersion(source.version);
+        const record = Object.assign({}, sourceRecord, {
+          metadata: [
+            { label: "撮影日", value: "2016-10-22" },
+            { label: "撮影場所", value: "北校舎 展示室前" },
+            { label: "所蔵元", value: "写真部" },
+            { label: "公開範囲", value: "一般公開" },
+            { label: "公開画像", value: media.id }
+          ],
+          description: source.version === 2 ? "公開用現行版。写っている部員は5名だが、画像説明は初版の6名表記を引き継いでいる。" : "公開用初版。原版は資料室の管理端末で閲覧できる。"
+        });
+        delete record.evidenceId;
+        delete record.medium;
+        delete record.detail;
+        const detailPage = archivePage("資料詳細 PC-2016-081", [record], media, {
+          versions: Array.isArray(previousDetail.versions) ? previousDetail.versions : [],
+          related: Array.isArray(previousDetail.related) ? previousDetail.related : []
+        });
+        detailPage.version = source.version;
+        if (source.availableWhen) detailPage.availableWhen = Array.isArray(source.availableWhen) ? source.availableWhen.slice() : source.availableWhen;
+        if (source.protectUntilSeen) detailPage.protectUntilSeen = source.protectUntilSeen;
+        return detailPage;
+      })
+    };
+  }
+
+  // 通常ページは各組織固有の現場写真を使い、事件写真や汎用机上写真の反復を避ける。
+  const normalSiteHeroAssignments = [
+    {
+      host: "tohama-its",
+      routes: ["/services", "/public", "/quality", "/security/report", "/news/2025-04"],
+      media: Object.assign(photo("P25", "東浜情報ソリューションズの運用室で、担当者二人が監視画面と確認表を照合している。", "公共システム運用室。変更作業は二人で確認する。", "東浜情報ソリューションズ"), { registryFile: "P25.png" })
+    },
+    {
+      host: "kirikawa-news",
+      routes: ["/authors/kawai", "/corrections", "/popular", "/tips", "/about"],
+      media: Object.assign(photo("P26", "新聞、取材機材、校正紙が積まれた霧川ローカルニュース編集部。スタッフが紙面を確認している。", "夕刊校了前の編集部。", "霧川ローカルニュース編集部"), { registryFile: "P26.png" })
+    },
+    {
+      host: "hokushin-wu",
+      routes: ["/", "/search", "/version-history", "/export"],
+      media: Object.assign(photo("P27", "北辰女子大学公開資料室の閲覧室。職員が保存箱の資料を整理し、手前に閲覧机と白手袋がある。", "公開資料室の閲覧・整理スペース。", "北辰女子大学 公開資料室"), { registryFile: "P27.png" })
+    },
+    {
+      host: "kirikawa-med",
+      routes: ["/", "/departments", "/hours", "/access", "/notices"],
+      media: Object.assign(photo("P28", "曇天の霧川市民医療センター正面。外来入口、歩道、駐輪場が見える。", "外来入口と正面ロータリー。", "霧川市民医療センター 広報委員会"), { registryFile: "P28.png" })
+    },
+    {
+      host: "crescent-home",
+      routes: ["/listings", "/listings/asagiri-203"],
+      media: Object.assign(photo("P29", "朝霧台コーポ203号室の空室内観。掃き出し窓、洋室、流し台が写っている。", "朝霧台コーポ203 / 1Kの洋室。", "クレセントホーム霧川"), { registryFile: "P29.png" })
+    },
+    {
+      host: "studio-lumen",
+      routes: ["/booking", "/pricing", "/faq", "/contact"],
+      media: Object.assign(photo("P30", "Studio Lumenの受付越しに撮影スペースが見え、スタッフがカメラを確認している。", "受付と撮影スペース。", "Studio Lumen"), { registryFile: "P30.png" })
+    }
+  ];
+  normalSiteHeroAssignments.forEach((assignment) => assignment.routes.forEach((routePath) => {
+    forRoute(assignment.host, routePath, (page) => {
+      page.heroMedia = Object.assign({}, assignment.media);
+      page.photoAlt = page.heroMedia.alt;
+    });
+  }));
 
   filterByTitle("kirikawa-city", ["notices"], ["熱中症予防のための公共施設開放", "河川清掃に伴う通行案内"]);
   filterByTitle("kirikawa-city", ["updates"], ["表記を更新", "掲載内容を確認"]);
