@@ -47,7 +47,7 @@
 
   function localAppUrl(value) {
     if (typeof value !== "string" || !/^apps\/[a-z0-9_-]+\/index\.html$/.test(value)) throw new Error("Invalid local app route");
-    return value;
+    return value === "apps/photos/index.html" ? value + "?v=photos-zoom-1" : value;
   }
 
   function persistWindow(id, win) {
